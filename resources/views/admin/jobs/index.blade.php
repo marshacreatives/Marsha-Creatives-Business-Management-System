@@ -10,33 +10,7 @@
     <a href="{{ route('admin.jobs.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition font-medium">+ Create Job</a>
 </div>
 
-<form method="GET" class="bg-white rounded-lg shadow p-4 mb-6">
-    <div class="flex items-center space-x-4">
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
-            <select name="status" onchange="this.form.submit()"
-                class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
-                <option value="">All Statuses</option>
-                @foreach($statuses as $val => $label)
-                    <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>{{ $label }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Employee</label>
-            <select name="employee_id" onchange="this.form.submit()"
-                class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
-                <option value="">All Employees</option>
-                @foreach($employees as $emp)
-                    <option value="{{ $emp->id }}" {{ request('employee_id') == $emp->id ? 'selected' : '' }}>{{ $emp->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="pt-5">
-            <a href="{{ route('admin.jobs.index') }}" class="text-sm text-blue-600 hover:underline">Clear</a>
-        </div>
-    </div>
-</form>
+<x-month-filter :availableMonths="[]" :selectedMonth="now()->format('Y-m')" :statuses="$statuses" :employees="$employees" />
 
 <div class="bg-white rounded-lg shadow overflow-hidden">
     <table class="min-w-full divide-y divide-gray-200">
