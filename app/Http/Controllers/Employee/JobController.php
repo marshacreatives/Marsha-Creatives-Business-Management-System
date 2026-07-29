@@ -93,10 +93,6 @@ class JobController extends Controller
     {
         $user = auth()->user();
 
-        if ($job->assigned_to !== $user->id) {
-            abort(403, 'You can only update your own jobs.');
-        }
-
         $request->validate([
             'status' => 'required|in:in_progress,completed,cancelled',
         ]);
