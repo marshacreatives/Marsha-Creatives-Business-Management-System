@@ -12,6 +12,25 @@
 
 <x-month-filter :availableMonths="$availableMonths" :selectedMonth="$selectedMonth" />
 
+<form method="GET" class="bg-white rounded-lg shadow p-4 mb-6">
+    <div class="flex items-center space-x-4">
+        <input type="hidden" name="month" value="{{ $selectedMonth }}">
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+            <select name="status" onchange="this.form.submit()"
+                class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <option value="">All Statuses</option>
+                @foreach($statuses as $val => $label)
+                    <option value="{{ $val }}" {{ request('status') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="pt-5">
+            <a href="{{ route('employee.jobs.index', ['month' => $selectedMonth]) }}" class="text-sm text-blue-600 hover:underline">Clear</a>
+        </div>
+    </div>
+</form>
+
 <div class="bg-white rounded-lg shadow overflow-hidden">
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">

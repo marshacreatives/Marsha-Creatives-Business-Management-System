@@ -21,13 +21,18 @@ class JobController extends Controller
         $selectedMonth = $this->getSelectedMonth($request);
         $availableMonths = $this->getAvailableMonths();
 
-        $jobs = ProjectJob::where('assigned_to', $user->id)
+        $query = ProjectJob::where('assigned_to', $user->id)
             ->whereBetween('created_at', [$start, $end])
-            ->with('creator')
-            ->latest()
-            ->get();
+            ->with('creator');
 
-        return view('employee.jobs.index', compact('jobs', 'selectedMonth', 'availableMonths'));
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $jobs = $query->latest()->get();
+        $statuses = ['in_progress' => 'In Progress', 'completed' => 'Completed', 'cancelled' => 'Cancelled'];
+
+        return view('employee.jobs.index', compact('jobs', 'selectedMonth', 'availableMonths', 'statuses'));
     }
 
     public function create()

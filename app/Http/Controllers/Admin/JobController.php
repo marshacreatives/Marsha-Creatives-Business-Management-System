@@ -11,13 +11,23 @@ use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $jobs = ProjectJob::with(['assignee', 'creator'])
-            ->latest()
-            ->get();
+        $query = ProjectJob::with(['assignee', 'creator']);
 
-        return view('admin.jobs.index', compact('jobs'));
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('employee_id')) {
+            $query->where('assigned_to', $request->employee_id);
+        }
+
+        $jobs = $query->latest()->get();
+        $employees = User::where('role', 'employee')->orderBy('name')->get();
+        $statuses = ['in_progress' => 'In Progress', 'completed' => 'Completed', 'cancelled' => 'Cancelled'];
+
+        return view('admin.jobs.index', compact('jobs', 'employees', 'statuses'));
     }
 
     public function create()
