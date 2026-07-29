@@ -1,10 +1,11 @@
 const CACHE_NAME = 'marsha-creatives-v1';
 
 const STATIC_ASSETS = [
-    '/',
     '/manifest.json',
     '/images/logo.png',
     '/images/header_logo.png',
+    '/images/icons/icon-192x192.png',
+    '/images/icons/icon-512x512.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -26,16 +27,23 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    const url = new URL(event.request.url);
+
+    const isStatic = STATIC_ASSETS.some((asset) => url.pathname === asset);
+    const isImage = url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico)$/);
+
+    if (isStatic || isImage) {
+        event.respondWith(
+            caches.match(event.request).then((cached) => cached || fetch(event.request))
+        );
+        return;
+    }
+
     event.respondWith(
-        caches.match(event.request).then((cached) => {
-            return cached || fetch(event.request).then((response) => {
-                return caches.open(CACHE_NAME).then((cache) => {
-                    if (event.request.method === 'GET') {
-                        cache.put(event.request, response.clone());
-                    }
-                    return response;
-                });
-            });
+        fetch(event.request).then((response) => {
+            return response;
+        }).catch(() => {
+            return caches.match(event.request).then((cached) => cached || new Response('Offline', { status: 503 }));
         })
     );
 });
