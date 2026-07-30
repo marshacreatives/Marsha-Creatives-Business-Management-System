@@ -85,4 +85,22 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', 'Employee updated successfully.');
     }
+
+    public function destroy(User $user)
+    {
+        if ($user->role !== 'employee') {
+            return redirect()->route('admin.users.index')->with('error', 'Cannot delete admin accounts.');
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        Activity::create([
+            'user_id' => auth()->id(),
+            'type' => 'user_deleted',
+            'description' => "Deleted employee account for '{$name}'",
+        ]);
+
+        return redirect()->route('admin.users.index')->with('success', "Employee '{$name}' deleted successfully.");
+    }
 }

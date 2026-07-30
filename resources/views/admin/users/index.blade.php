@@ -28,8 +28,13 @@
                     <td class="px-6 py-4 text-gray-600">{{ $employee->email }}</td>
                     <td class="px-6 py-4 text-gray-600">{{ $employee->assigned_jobs_count }}</td>
                     <td class="px-6 py-4 text-gray-600">{{ $employee->created_at->format('M d, Y') }}</td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 space-x-2">
                         <a href="{{ route('admin.users.edit', $employee) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
+                        <form method="POST" action="{{ route('admin.users.destroy', $employee) }}" class="inline" onsubmit="return confirm('Delete {{ $employee->name }}? This cannot be undone.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
+                        </form>
                     </td>
                 </tr>
             @empty
