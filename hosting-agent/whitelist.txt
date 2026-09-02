@@ -1,0 +1,13 @@
+# =============================================
+# IP Whitelist - one IP or CIDR per line.
+# These IPs will NEVER be blocked by the agent.
+# Lines starting with # are ignored.
+# =============================================
+
+# Local / infrastructure addresses (safety net)
+127.0.0.1
+::1
+
+# Example: your own office / VPN static IPs
+# 203.0.113.10
+# 198.51.100.0/24

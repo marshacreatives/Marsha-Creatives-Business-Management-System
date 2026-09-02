@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Employee;
+use App\Http\Controllers\Security;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('login'));
@@ -10,6 +11,25 @@ Route::get('/', fn () => redirect()->route('login'));
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::middleware(['auth.custom', 'admin'])->prefix('security')->name('security.')->group(function () {
+    Route::get('/', [Security\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/alerts', [Security\AlertController::class, 'index'])->name('alerts.index');
+    Route::get('/alerts/{alert}', [Security\AlertController::class, 'show'])->name('alerts.show');
+    Route::post('/alerts/{alert}/resolve', [Security\AlertController::class, 'resolve'])->name('alerts.resolve');
+    Route::post('/alerts/{alert}/reopen', [Security\AlertController::class, 'reopen'])->name('alerts.reopen');
+    Route::delete('/alerts/{alert}', [Security\AlertController::class, 'destroy'])->name('alerts.destroy');
+
+    Route::get('/blocks', [Security\IPBlockController::class, 'index'])->name('blocks.index');
+    Route::post('/blocks', [Security\IPBlockController::class, 'block'])->name('blocks.store');
+    Route::post('/blocks/{block}/unblock', [Security\IPBlockController::class, 'unblock'])->name('blocks.unblock');
+    Route::delete('/blocks/{block}', [Security\IPBlockController::class, 'destroy'])->name('blocks.destroy');
+
+    Route::get('/server-status', [Security\ServerStatusController::class, 'index'])->name('server-status');
+
+    Route::get('/settings', [Security\SettingsController::class, 'index'])->name('settings');
+    Route::post('/settings', [Security\SettingsController::class, 'update'])->name('settings.update');
+});
 
 Route::middleware(['auth.custom', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');

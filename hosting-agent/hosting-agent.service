@@ -1,0 +1,36 @@
+[Unit]
+Description=Web Hosting Security Agent
+Documentation=file:///etc/hosting-agent/README.md
+After=network.target network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/hosting-agent
+ExecStart=/usr/bin/env python3 /opt/hosting-agent/agent.py --daemon
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+# Give the agent time to start cleanly
+TimeoutStartSec=30
+TimeoutStopSec=30
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=false
+ReadWritePaths=/var/log/hosting-agent /opt/hosting-agent /etc/hosting-agent
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_ADMIN
+AmbientCapabilities=CAP_NET_ADMIN
+# Since the agent needs to read server logs and manage the firewall,
+# we run as root. Protect* directives above still add safety.
+
+[Install]
+WantedBy=multi-user.target
