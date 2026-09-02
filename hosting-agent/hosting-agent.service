@@ -18,19 +18,15 @@ RestartSec=10
 TimeoutStartSec=30
 TimeoutStopSec=30
 
-# Security hardening
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=false
-ReadWritePaths=/var/log/hosting-agent /opt/hosting-agent /etc/hosting-agent
-ProtectKernelTunables=true
-ProtectKernelModules=true
-ProtectControlGroups=true
-CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_ADMIN
-AmbientCapabilities=CAP_NET_ADMIN
-# Since the agent needs to read server logs and manage the firewall,
-# we run as root. Protect* directives above still add safety.
+# NOTE: The agent is a security/monitoring daemon that runs firewall (CSF),
+# reads server logs, and manages IP blocking under cPanel/WHM. On cPanel,
+# CSF is a Perl script that needs access to /usr/local/csf, /etc/csf, /tmp
+# and the cPanel Perl environment. Over-strict sandboxing (ProtectSystem,
+# PrivateTmp, NoNewPrivileges, tight CapabilityBoundingSet) breaks csf, so
+# we run with a normal root environment.
+Environment=PERL5LIB=/usr/local/csf/lib/:/usr/local/csf/lib/arch
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 
 [Install]
 WantedBy=multi-user.target
