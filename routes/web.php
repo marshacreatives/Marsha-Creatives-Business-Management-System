@@ -27,6 +27,8 @@ Route::middleware(['auth.custom', 'admin'])->prefix('security')->name('security.
 
     Route::get('/server-status', [Security\ServerStatusController::class, 'index'])->name('server-status');
 
+    Route::get('/actions', [Security\AgentActionController::class, 'index'])->name('actions.index');
+
     Route::get('/settings', [Security\SettingsController::class, 'index'])->name('settings');
     Route::post('/settings', [Security\SettingsController::class, 'update'])->name('settings.update');
 });

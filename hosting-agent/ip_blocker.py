@@ -203,6 +203,13 @@ class IPBlocker:
         if success:
             # Report to dashboard
             self.reporter.report_block(ip, reason, duration)
+            self.reporter.report_action(
+                action='block_ip',
+                resource=ip,
+                severity='high',
+                description=f"Blocked IP {ip}: {reason}",
+                details=f"duration={duration}s method={self.block_method}",
+            )
 
         return success
 
@@ -239,6 +246,16 @@ class IPBlocker:
         except Exception as e:
             self._log(f"Error unblocking {ip}: {e}", 'error')
             return False
+
+        if success:
+            self.reporter.report_unblock(ip, 'manual/expiry')
+            self.reporter.report_action(
+                action='unblock_ip',
+                resource=ip,
+                severity='info',
+                description=f"Unblocked IP {ip}",
+                details=f"method={self.block_method}",
+            )
 
         return success
 

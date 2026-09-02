@@ -10,4 +10,5 @@ Route::prefix('agent')->middleware('agent.api')->group(function () {
     Route::post('/block', [AgentController::class, 'storeBlock']);
     Route::post('/unblock', [AgentController::class, 'storeUnblock']);
     Route::post('/log', [AgentController::class, 'storeLog']);
+    Route::post('/action', [AgentController::class, 'storeAction']);
 });

@@ -179,6 +179,13 @@ class FileIntegrity:
                                    "Uploads directories must not contain executable scripts.",
                         'action_taken': 'Remove file and quarantine account immediately',
                     })
+                    self.reporter.report_action(
+                        action='quarantine_file',
+                        resource=filepath,
+                        severity='critical',
+                        description=f"Executable injected into WordPress uploads ({account}:{rel})",
+                        details=f"The file {fname} must be removed and the account {account} quarantined.",
+                    )
                     continue
 
                 # Disguised filename (e.g. image.png.php) - inspect content too.
@@ -200,6 +207,13 @@ class FileIntegrity:
                         'raw_log': f"File: {filepath}\nSnippet:\n{self._snippet(content)}",
                         'action_taken': 'Remove file and quarantine account immediately',
                     })
+                    self.reporter.report_action(
+                        action='quarantine_file',
+                        resource=filepath,
+                        severity='critical',
+                        description=f"Disguised malicious file in WordPress uploads ({account}:{rel})",
+                        details=f"The file {fname} contains obfuscated code and must be removed.",
+                    )
                 else:
                     # Disguised extension with executable content is still high risk
                     findings.append({

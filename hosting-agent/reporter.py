@@ -36,6 +36,7 @@ class Reporter:
         self._alert_api_url = f"{self.api_url.rstrip('/')}/alert" if self.api_url else ''
         self._status_api_url = f"{self.api_url.rstrip('/')}/status" if self.api_url else ''
         self._block_api_url = f"{self.api_url.rstrip('/')}/block" if self.api_url else ''
+        self._action_api_url = f"{self.api_url.rstrip('/')}/action" if self.api_url else ''
 
         self._telegram_api_base = f"https://api.telegram.org/bot{self.tg_token}" if self.tg_token else ''
 
@@ -116,6 +117,26 @@ class Reporter:
             f"<b>Server:</b> {self._html(self.server_name)}",
             parse_mode='HTML',
         )
+
+    def report_action(self, action: str, resource: str = None,
+                      severity: str = 'info', status: str = 'completed',
+                      description: str = None, details: str = None):
+        """Record a discrete agent action on the dashboard audit trail.
+
+        Used for every action the agent performs (block_ip, unblock_ip,
+        kill_process, quarantine_file, ...) so the dashboard has a complete,
+        searchable record alongside alerts.
+        """
+        self._http_post(self._action_api_url, {
+            'server_name': self.server_name,
+            'action': action,
+            'resource': resource,
+            'severity': severity,
+            'status': status,
+            'description': description,
+            'details': details,
+            'performed_at': time.strftime('%Y-%m-%dT%H:%M:%S.000Z', time.gmtime()),
+        })
 
     # ------------------------------------------------------------------
     # Telegram

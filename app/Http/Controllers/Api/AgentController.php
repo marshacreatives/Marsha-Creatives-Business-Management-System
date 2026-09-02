@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AgentAction;
 use App\Models\AgentLog;
 use App\Models\BlockedIP;
 use App\Models\SecurityAlert;
@@ -222,5 +223,44 @@ class AgentController extends Controller
             'success' => true,
             'time' => now()->toIso8601String(),
         ]);
+    }
+
+    /**
+     * Record a discrete agent action (block_ip, unblock_ip, kill_process,
+     * quarantine_file, etc.) for the audit trail. Every action the agent
+     * takes is posted here so the dashboard has a complete record.
+     */
+    public function storeAction(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'server_name' => 'nullable|string',
+            'action' => 'required|string',
+            'resource' => 'nullable|string',
+            'severity' => 'nullable|string|in:critical,high,medium,low,info',
+            'status' => 'nullable|string',
+            'description' => 'nullable|string',
+            'details' => 'nullable|string',
+            'performed_at' => 'required|date',
+        ]);
+
+        try {
+            AgentAction::create([
+                'server_name' => $validated['server_name'] ?? null,
+                'action' => $validated['action'],
+                'resource' => $validated['resource'] ?? null,
+                'severity' => $validated['severity'] ?? 'info',
+                'status' => $validated['status'] ?? 'completed',
+                'description' => $validated['description'] ?? null,
+                'details' => $validated['details'] ?? null,
+                'performed_at' => $validated['performed_at'],
+            ]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

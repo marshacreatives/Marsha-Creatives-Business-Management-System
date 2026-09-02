@@ -207,4 +207,37 @@
         </div>
     @endif
 </div>
+
+<!-- Agent action audit trail -->
+<div class="bg-white rounded-lg shadow p-6 mt-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Agent Action Trail</h3>
+        <a href="{{ route('security.actions.index') }}" class="text-sm text-blue-600 hover:text-blue-700">View All</a>
+    </div>
+    @if($recentActions->isEmpty())
+        <p class="text-gray-500 text-sm">No agent actions recorded yet.</p>
+    @else
+        <div class="space-y-3">
+            @foreach($recentActions as $action)
+                <div class="flex items-start justify-between p-3 rounded-lg border border-gray-100">
+                    <div class="flex items-start space-x-3">
+                        <span class="w-2 h-2 rounded-full mt-1.5 {{ $action->severity_badge }}"></span>
+                        <div>
+                            <p class="text-sm">
+                                <span class="font-medium text-gray-800">{{ $action->action }}</span>
+                                @if($action->resource)
+                                    <span class="text-purple-700 font-mono text-xs ml-2">{{ $action->resource }}</span>
+                                @endif
+                            </p>
+                            @if($action->description)
+                                <p class="text-xs text-gray-600 mt-0.5">{{ $action->description }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400 whitespace-nowrap ml-4">{{ $action->performed_at?->diffForHumans() }}</span>
+                </div>
+            @endforeach
+        </div>
+    @endif
+</div>
 @endsection

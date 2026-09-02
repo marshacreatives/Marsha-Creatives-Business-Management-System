@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Security;
 
 use App\Http\Controllers\Controller;
+use App\Models\AgentAction;
 use App\Models\AgentLog;
 use App\Models\BlockedIP;
 use App\Models\SecurityAlert;
@@ -30,6 +31,7 @@ class DashboardController extends Controller
         $recentBlocks = BlockedIP::where('is_active', true)->latest('blocked_at')->limit(10)->get();
         $latestStatus = ServerStatus::latest('checked_at')->first();
         $agentLogs = AgentLog::latest('started_at')->limit(8)->get();
+        $recentActions = AgentAction::latest('performed_at')->limit(8)->get();
 
         return view('security.index', compact(
             'stats',
@@ -37,6 +39,7 @@ class DashboardController extends Controller
             'recentBlocks',
             'latestStatus',
             'agentLogs',
+            'recentActions',
         ));
     }
 }

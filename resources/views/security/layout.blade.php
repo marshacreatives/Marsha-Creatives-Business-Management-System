@@ -19,6 +19,7 @@
         <a href="{{ route('security.dashboard') }}" class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap {{ request()->routeIs('security.dashboard') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Overview</a>
         <a href="{{ route('security.alerts.index') }}" class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap {{ request()->routeIs('security.alerts.*') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Alerts</a>
         <a href="{{ route('security.blocks.index') }}" class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap {{ request()->routeIs('security.blocks.*') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Blocked IPs</a>
+        <a href="{{ route('security.actions.index') }}" class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap {{ request()->routeIs('security.actions.*') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Agent Actions</a>
         <a href="{{ route('security.server-status') }}" class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap {{ request()->routeIs('security.server-status') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Server Status</a>
         <a href="{{ route('security.settings') }}" class="px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap {{ request()->routeIs('security.settings') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Settings</a>
     </nav>

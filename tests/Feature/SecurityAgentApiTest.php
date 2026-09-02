@@ -88,4 +88,28 @@ class SecurityAgentApiTest extends TestCase
 
         $this->assertDatabaseCount('server_statuses', 1);
     }
+
+    public function test_store_action(): void
+    {
+        config(['security.agent_api_key' => 'test-secret']);
+
+        $response = $this->withHeaders(['X-Agent-Key' => 'test-secret'])
+            ->postJson('/api/agent/action', [
+                'server_name' => 'server1',
+                'action' => 'kill_process',
+                'resource' => '12345',
+                'severity' => 'high',
+                'description' => 'Killed runaway process miner (PID 12345) under high load',
+                'performed_at' => now()->toIso8601String(),
+            ]);
+
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('agent_actions', [
+            'action' => 'kill_process',
+            'resource' => '12345',
+            'severity' => 'high',
+        ]);
+    }
 }

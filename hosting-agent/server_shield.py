@@ -213,6 +213,14 @@ class ServerShield:
                         self._kill(pid, 9)
                         self.logger.warning(f"server_shield: SIGKILL sent to PID {pid} ({base})")
                     finding['action_taken'] = f"Killed runaway process {base} (PID {pid})"
+                    # Record the kill action on the dashboard audit trail
+                    self.reporter.report_action(
+                        action='kill_process',
+                        resource=str(pid),
+                        severity='high',
+                        description=f"Killed runaway process {base} (PID {pid}) under high load",
+                        details=proc['cmd'][:400],
+                    )
 
             findings.append(finding)
             self._watch.pop(pid, None)
