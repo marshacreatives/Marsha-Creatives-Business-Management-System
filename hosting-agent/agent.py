@@ -86,6 +86,7 @@ class HostingAgent:
         from port_scanner import PortScanner
         from process_monitor import ProcessMonitor
         from file_integrity import FileIntegrity
+        from server_shield import ServerShield
 
         modules = []
         if self.config.getboolean('general', 'enable_ssh_guard', fallback=True):
@@ -98,6 +99,8 @@ class HostingAgent:
             modules.append(ProcessMonitor(self.config, self.reporter, self.ip_blocker, self.logger))
         if self.config.getboolean('general', 'enable_file_integrity', fallback=True):
             modules.append(FileIntegrity(self.config, self.reporter, self.ip_blocker, self.logger))
+        if self.config.getboolean('general', 'enable_server_shield', fallback=True):
+            modules.append(ServerShield(self.config, self.reporter, self.ip_blocker, self.logger))
 
         return modules
 

@@ -49,6 +49,7 @@ cp "$SCRIPT_DIR"/agent.py \
    "$SCRIPT_DIR"/port_scanner.py \
    "$SCRIPT_DIR"/process_monitor.py \
    "$SCRIPT_DIR"/file_integrity.py \
+   "$SCRIPT_DIR"/server_shield.py \
    "$SCRIPT_DIR"/monitor.sh \
    "$SCRIPT_DIR"/requirements.txt "$INSTALL_DIR/"
 

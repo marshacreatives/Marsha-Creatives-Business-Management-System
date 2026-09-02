@@ -59,6 +59,15 @@ class FileIntegrity:
             r'AddHandler.*\.php|php_value\s+auto_prepend)' , re.IGNORECASE
         )
 
+        # Extensions that should NEVER appear in an uploads/media directory
+        # (this is how attackers hide PHP webshells among images/docs).
+        self._webshell_exts = ('.php', '.php5', '.php7', '.php8', '.phtml', '.pht', '.phar', '.shtml', '.cgi')
+        # Filename disguises attackers use to smuggle PHP into uploads.
+        self._disguise_re = re.compile(
+            r'\.(php\d?|phtml|pht|phar)\.?$|\.(jpg|jpeg|png|gif|ico|svg)\.php\d?$',
+            re.IGNORECASE,
+        )
+
     def check(self):
         """Scan for webshells and file integrity issues.
         Returns a list of alert dicts.
@@ -91,6 +100,10 @@ class FileIntegrity:
                 if not os.path.isdir(root):
                     continue
                 self._scan_directory(root, account_dir, findings)
+                # Attackers hide PHP webshells in WordPress uploads/media dirs.
+                # These should ONLY contain non-executable files, so any
+                # executable here is almost certainly an injection.
+                self._scan_wordpress_uploads(root, account_dir, findings)
 
             # Check for injected .htaccess files
             self._scan_htaccess(user_home, account_dir, findings)
@@ -121,6 +134,81 @@ class FileIntegrity:
 
         if scanned == 0:
             return
+
+    def _scan_wordpress_uploads(self, web_root: str, account: str, findings: list):
+        """Scan WordPress upload/media directories for injected executables.
+
+        wp-content/uploads (and similar media dirs) should only hold images,
+        videos, PDFs, zips, etc. Any PHP/shell file present there is treated as
+        a probable injection and flagged with high confidence.
+        """
+        uploads_root = os.path.join(web_root, 'wp-content', 'uploads')
+        if not os.path.isdir(uploads_root):
+            return
+
+        for dirpath, dirnames, filenames in os.walk(uploads_root):
+            dirnames[:] = [d for d in dirnames if d not in self.exclude_dirs]
+            for fname in filenames:
+                lower = fname.lower()
+                # An executable extension in an uploads dir = suspicious
+                is_exec = lower.endswith(self._webshell_exts)
+                is_disguised = bool(self._disguise_re.search(lower))
+                if not (is_exec or is_disguised):
+                    continue
+
+                filepath = os.path.join(dirpath, fname)
+                try:
+                    size = os.path.getsize(filepath)
+                except OSError:
+                    continue
+                if size == 0 or size > self.max_scan_size:
+                    continue
+
+                rel = os.path.relpath(filepath, os.path.join(self.home_base, account))
+
+                # A bare .php in uploads is almost certainly a webshell.
+                if lower.endswith(('.php', '.php5', '.php7', '.php8', '.phtml', '.pht', '.phar', '.shtml', '.cgi')):
+                    findings.append({
+                        'type': 'wordpress_webshell',
+                        'severity': 'critical',
+                        'description': (
+                            f"Executable file injected into WordPress uploads: "
+                            f"{account}:{rel}"
+                        ),
+                        'raw_log': f"File: {filepath}\n"
+                                   "Uploads directories must not contain executable scripts.",
+                        'action_taken': 'Remove file and quarantine account immediately',
+                    })
+                    continue
+
+                # Disguised filename (e.g. image.png.php) - inspect content too.
+                content = ''
+                try:
+                    with open(filepath, 'r', errors='ignore') as f:
+                        content = f.read(20000)
+                except OSError:
+                    pass
+
+                if self._obfuscated_re.search(content) or self._dangerous_fn_re.search(content):
+                    findings.append({
+                        'type': 'wordpress_webshell',
+                        'severity': 'critical',
+                        'description': (
+                            f"Disguised malicious file in WordPress uploads "
+                            f"({fname}): {account}:{rel}"
+                        ),
+                        'raw_log': f"File: {filepath}\nSnippet:\n{self._snippet(content)}",
+                        'action_taken': 'Remove file and quarantine account immediately',
+                    })
+                else:
+                    # Disguised extension with executable content is still high risk
+                    findings.append({
+                        'type': 'wordpress_webshell',
+                        'severity': 'high',
+                        'description': f"Suspicious executable-named file in uploads: {account}:{rel}",
+                        'raw_log': f"File: {filepath}",
+                        'action_taken': 'Review and remove if not legitimate',
+                    })
 
     def _inspect_php_file(self, filepath: str, account: str, findings: list):
         """Check a single PHP file for webshell signatures."""
