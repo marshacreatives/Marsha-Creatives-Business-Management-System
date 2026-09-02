@@ -54,6 +54,16 @@ class FileIntegrity:
             r'base64_decode\(\s*["\'][A-Za-z0-9+/=]{100,})',
             re.IGNORECASE,
         )
+        # Execution signal: a dangerous function called with a dynamic/variable
+        # or base64-decoded argument — the real webshell pattern. Legit library
+        # code passes safe literal/known args, which this avoids matching.
+        self._execution_signal_re = re.compile(
+            r'\b(eval|base64_decode|shell_exec|system|exec|passthru|'
+            r'proc_open|popen|assert|create_function)'
+            r'\s*\(\s*(\$|\$\{|base64_decode|gzinflate|str_rot13|'
+            r'file_get_contents|implode|chr\(|["\']\s*\.\s*\$|@\s*\$)',
+            re.IGNORECASE,
+        )
         self._global_htaccess_re = re.compile(
             r'(Options\s+.*ExecCGI|AddType\s+application/x-httpd-php|'
             r'AddHandler.*\.php|php_value\s+auto_prepend)' , re.IGNORECASE
@@ -114,8 +124,14 @@ class FileIntegrity:
         """Recursively scan a directory for suspicious PHP files."""
         scanned = 0
         for dirpath, dirnames, filenames in os.walk(root):
-            # Prune excluded dirs
-            dirnames[:] = [d for d in dirnames if d not in self.exclude_dirs]
+            # Prune excluded dirs (and any Composer "vendor*" dependency dir,
+            # e.g. vendor, vendor-prefixed, vendor_prefixed — these are
+            # legitimate library code in plugins/themes, not webshells).
+            dirnames[:] = [
+                d for d in dirnames
+                if d not in self.exclude_dirs
+                and not d.lower().startswith('vendor')
+            ]
 
             for fname in filenames:
                 if not fname.endswith(('.php', '.php5', '.phtml', '.php7', '.pht')):
@@ -250,15 +266,19 @@ class FileIntegrity:
                     'action_taken': 'Quarantine account and scan thoroughly',
                 })
             else:
-                # Still worth noting (could be legit framework, but on web hosting
-                # eval+base64 combination is almost always suspicious)
-                findings.append({
-                    'type': 'webshell',
-                    'severity': 'high',
-                    'description': f"Suspicious dangerous function in {account}: {rel_path}",
-                    'raw_log': f"File: {filepath}\nSnippet:\n{self._snippet(content)}",
-                    'action_taken': 'Review file for legitimacy',
-                })
+                # Flag only when a dangerous function is paired with an actual
+                # execution signal (a payload variable or base64 in its arg),
+                # not a single benign use in a library. Legit framework code
+                # calls eval/exec/assert safely; real webshells pass them a
+                # dynamic, often base64-encoded string.
+                if self._execution_signal_re.search(content):
+                    findings.append({
+                        'type': 'webshell',
+                        'severity': 'high',
+                        'description': f"Suspicious dangerous function in {account}: {rel_path}",
+                        'raw_log': f"File: {filepath}\nSnippet:\n{self._snippet(content)}",
+                        'action_taken': 'Review file for legitimacy',
+                    })
 
         # 2. Forged PHP with .htaccess combo already covered separately
 

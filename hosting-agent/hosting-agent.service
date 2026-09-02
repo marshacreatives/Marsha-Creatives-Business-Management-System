@@ -24,7 +24,11 @@ TimeoutStopSec=30
 # and the cPanel Perl environment. Over-strict sandboxing (ProtectSystem,
 # PrivateTmp, NoNewPrivileges, tight CapabilityBoundingSet) breaks csf, so
 # we run with a normal root environment.
-Environment=PERL5LIB=/usr/local/csf/lib/:/usr/local/csf/lib/arch
+#
+# IMPORTANT: Do NOT set PERL5LIB here. csf (run via its cPanel-perl shebang)
+# deliberately strips any rogue PERL5LIB in its BEGIN block, which breaks its
+# module loading and causes "BEGIN failed--compilation aborted". Only PATH is
+# set so /usr/sbin/csf resolves correctly.
 Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 
