@@ -48,12 +48,11 @@ class AgentController extends Controller
                 'occurred_at' => $validated['occurred_at'],
             ]);
 
-            // Send to Telegram if critical/high
-            if (in_array($alert->severity, ['critical', 'high'])) {
-                $this->telegram->sendAlert($alert->toArray() + [
-                    'server_name' => $validated['server_name'],
-                ]);
-            }
+            // NOTE: Telegram notifications are handled by the agent itself
+            // (hosting-agent/reporter.py), which sends alerts directly to
+            // Telegram. We deliberately do NOT block this request on a
+            // synchronous outbound Telegram call here so the agent API stays
+            // fast and reliable even if Telegram is slow or unreachable.
 
             return response()->json([
                 'success' => true,

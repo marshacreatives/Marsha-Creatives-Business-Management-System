@@ -64,17 +64,28 @@ class ProcessMonitor:
             reason = None
             severity = 'low'
 
-            # Check for exact-known miner binaries
+            # Check for exactly-known miner binaries (whole-word match to avoid
+            # false positives from substrings like "nc" inside "conn", "incron", etc.)
             for kw in self.miner_keywords:
-                if kw.lower() in cmd_lower:
+                if re.search(r'\b' + re.escape(kw.lower()) + r'\b', cmd_lower):
                     is_suspicious = True
                     reason = f"Crypto miner detected (match: {kw})"
                     severity = 'critical'
                     break
 
             if not is_suspicious:
+                # Backdoor tools: use word-boundary match, and only flag real
+                # netcat binaries, not any process whose path merely contains "nc".
                 for kw in self.backdoor_keywords:
-                    if kw.lower() in cmd_lower:
+                    kwl = kw.lower()
+                    if kwl in ('nc', 'netcat'):
+                        # netcat/binaries depend on path: /bin/nc, /usr/bin/nc, ncat
+                        if re.search(r'(^|[/\s])n(cat|etcat)?(\s|$)|\bncat\b', cmd_lower):
+                            is_suspicious = True
+                            reason = f"Potential backdoor/shell tool detected (match: {kw})"
+                            severity = 'high'
+                            break
+                    elif re.search(r'\b' + re.escape(kwl) + r'\b', cmd_lower):
                         is_suspicious = True
                         reason = f"Potential backdoor/shell tool detected (match: {kw})"
                         severity = 'high'

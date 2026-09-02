@@ -98,10 +98,11 @@ class Reporter:
             'blocked_by': self.server_name,
         })
         self.send_telegram_message(
-            f"🚫 *IP BLOCKED:* `{ip}`\n"
-            f"*Reason:* {reason}\n"
-            f"*Server:* {self.server_name}\n"
-            f"*Duration:* {duration//3600}h"
+            f"🚫 <b>IP BLOCKED:</b> <code>{self._html(ip)}</code>\n"
+            f"<b>Reason:</b> {self._html(reason)}\n"
+            f"<b>Server:</b> {self._html(self.server_name)}\n"
+            f"<b>Duration:</b> {self._html(duration//3600)}h",
+            parse_mode='HTML',
         )
 
     def report_unblock(self, ip: str, reason: str = ''):
@@ -111,8 +112,9 @@ class Reporter:
             'reason': reason,
         })
         self.send_telegram_message(
-            f"✅ *IP UNBLOCKED:* `{ip}`\n"
-            f"*Server:* {self.server_name}"
+            f"✅ <b>IP UNBLOCKED:</b> <code>{self._html(ip)}</code>\n"
+            f"<b>Server:</b> {self._html(self.server_name)}",
+            parse_mode='HTML',
         )
 
     # ------------------------------------------------------------------
@@ -121,6 +123,10 @@ class Reporter:
     def _severity_level_rank(self, level: str) -> int:
         rank = {'critical': 5, 'high': 4, 'medium': 3, 'low': 2, 'info': 1}
         return rank.get(level, 3)
+
+    def _html(self, value) -> str:
+        """Escape text for safe embedding in Telegram HTML messages."""
+        return str(value).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
     def send_telegram_alert(self, alert: dict):
         """Send a formatted alert to Telegram if it meets the threshold."""
@@ -140,32 +146,42 @@ class Reporter:
         }.get(alert.get('severity'), '⚪')
 
         text = (
-            f"{emoji} *SECURITY ALERT: {alert.get('type', '').upper()}*\n"
-            f"*Severity:* {alert.get('severity', '').upper()}\n"
+            f"{emoji} <b>SECURITY ALERT: {self._html(alert.get('type', '').upper())}</b>\n"
+            f"<b>Severity:</b> {self._html(alert.get('severity', '').upper())}\n"
         )
         if alert.get('source_ip'):
-            text += f"*Source IP:* `{alert.get('source_ip')}`\n"
-        text += f"*Description:* {alert.get('description', '')}\n"
+            text += f"<b>Source IP:</b> <code>{self._html(alert.get('source_ip'))}</code>\n"
+        text += f"<b>Description:</b> {self._html(alert.get('description', ''))}\n"
         if alert.get('action_taken'):
-            text += f"*Action:* {alert.get('action_taken')}\n"
-        text += f"*Time:* {alert.get('occurred_at', '')}\n"
-        text += f"*Server:* {alert.get('server_name', self.server_name)}"
+            text += f"<b>Action:</b> {self._html(alert.get('action_taken'))}\n"
+        text += f"<b>Time:</b> {self._html(alert.get('occurred_at', ''))}\n"
+        text += f"<b>Server:</b> {self._html(alert.get('server_name', self.server_name))}"
 
-        self.send_telegram_message(text)
+        self.send_telegram_message(text, parse_mode='HTML')
 
-    def send_telegram_message(self, text: str, parse_mode: str = 'Markdown'):
-        """Send a plain message to Telegram."""
+    def send_telegram_message(self, text: str, parse_mode: str = 'HTML'):
+        """Send a message to Telegram.
+        Uses HTML parse mode by default. Falls back to plain text if the
+        message fails to parse, so dynamic content never breaks delivery.
+        """
         if not self.tg_enabled or not self._telegram_api_base or not self.tg_chat_id:
             return
 
         url = f"{self._telegram_api_base}/sendMessage"
+
+        # Try with parse mode (HTML) first
         payload = {
             'chat_id': self.tg_chat_id,
             'text': text,
             'parse_mode': parse_mode,
             'disable_web_page_preview': True,
         }
-        self._http_post(url, payload)
+        result = self._http_post(url, payload)
+
+        # If parse failed (HTTP 400), retry as plain text so alerts always deliver
+        if result is None:
+            payload['parse_mode'] = ''
+            self._http_post(url, {k: v for k, v in payload.items() if v != ''})
 
     def send_daily_summary(self):
         """Send a daily summary of security events to Telegram."""
@@ -173,14 +189,13 @@ class Reporter:
             return
 
         try:
-            # Gather counts from local log if available, else just generic
             text = (
-                f"📊 *DAILY SECURITY SUMMARY*\n"
-                f"*Server:* {self.server_name}\n"
-                f"*Date:* {time.strftime('%Y-%m-%d')}\n\n"
+                f"📊 <b>DAILY SECURITY SUMMARY</b>\n"
+                f"<b>Server:</b> {self._html(self.server_name)}\n"
+                f"<b>Date:</b> {self._html(time.strftime('%Y-%m-%d'))}\n\n"
                 f"All security checks are active.\n"
                 f"Full report available on the dashboard."
             )
-            self.send_telegram_message(text)
+            self.send_telegram_message(text, parse_mode='HTML')
         except Exception as e:
             self.logger.error(f"Error sending daily summary: {e}")
