@@ -53,7 +53,7 @@
                     <span id="offlineBadge" class="hidden px-2 py-1 text-xs rounded-full bg-red-500 text-white">Offline</span>
                     <span class="text-gray-300 text-sm">{{ auth()->user()->name }}</span>
                     <span class="px-2 py-1 text-xs rounded-full {{ auth()->user()->isAdmin() ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white' }}">{{ ucfirst(auth()->user()->role) }}</span>
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
                         @csrf
                         <button type="submit" class="text-gray-300 hover:text-white text-sm">Logout</button>
                     </form>
@@ -82,6 +82,10 @@
                         <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
                         Install App
                     </button>
+                    <form method="POST" action="{{ route('logout') }}" class="pt-2 border-t border-white/10">
+                        @csrf
+                        <button type="submit" class="w-full text-left text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">Logout</button>
+                    </form>
                 </div>
             </div>
         </div>
