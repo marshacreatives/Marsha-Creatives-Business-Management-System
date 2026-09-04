@@ -1,0 +1,32 @@
+{
+    "name": "Marsha Creatives Business Management System",
+    "short_name": "Marsha BMS",
+    "description": "Business management system for Marsha Creatives - jobs, balance, financials and security dashboard.",
+    "start_url": "/login",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#1e3a5f",
+    "theme_color": "#1e3a5f",
+    "lang": "en",
+    "icons": [
+        {
+            "src": "/images/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
