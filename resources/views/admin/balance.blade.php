@@ -70,40 +70,42 @@
     <div class="px-6 py-4 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-800">Balance Activity</h3>
     </div>
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Previous Balance</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">New Balance</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Done By</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-            @forelse($balanceLogs as $log)
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm text-gray-600">{{ $log->created_at->format('M d, Y H:i') }}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 text-xs rounded-full font-medium
-                            {{ $log->type === 'add' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
-                            {{ $log->type === 'add' ? 'Top-up' : 'Set' }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 font-semibold {{ $log->type === 'add' ? 'text-green-600' : 'text-blue-600' }}">
-                        {{ $log->type === 'add' ? '+' : '' }}KSh {{ number_format($log->amount, 2) }}
-                    </td>
-                    <td class="px-6 py-4 text-gray-600">KSh {{ number_format($log->previous_balance, 2) }}</td>
-                    <td class="px-6 py-4 font-semibold text-gray-800">KSh {{ number_format($log->new_balance, 2) }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $log->user->name }}</td>
-                </tr>
-            @empty
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
                 <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">No balance activity for this month.</td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Previous Balance</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">New Balance</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Done By</th>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @forelse($balanceLogs as $log)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ $log->created_at->format('M d, Y H:i') }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full font-medium
+                                {{ $log->type === 'add' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                                {{ $log->type === 'add' ? 'Top-up' : 'Set' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 font-semibold {{ $log->type === 'add' ? 'text-green-600' : 'text-blue-600' }}">
+                            {{ $log->type === 'add' ? '+' : '' }}KSh {{ number_format($log->amount, 2) }}
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">KSh {{ number_format($log->previous_balance, 2) }}</td>
+                        <td class="px-6 py-4 font-semibold text-gray-800">KSh {{ number_format($log->new_balance, 2) }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ $log->user->name }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">No balance activity for this month.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

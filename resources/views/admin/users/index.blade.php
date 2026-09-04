@@ -11,38 +11,40 @@
 </div>
 
 <div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jobs Assigned</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-            @forelse($employees as $employee)
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-800">{{ $employee->name }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $employee->email }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $employee->assigned_jobs_count }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $employee->created_at->format('M d, Y') }}</td>
-                    <td class="px-6 py-4 space-x-2">
-                        <a href="{{ route('admin.users.edit', $employee) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
-                        <form method="POST" action="{{ route('admin.users.destroy', $employee) }}" class="inline" onsubmit="return confirm('Delete {{ $employee->name }}? This cannot be undone.')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
                 <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">No employees found. <a href="{{ route('admin.users.create') }}" class="text-green-600 hover:underline">Register one</a></td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jobs Assigned</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @forelse($employees as $employee)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-800">{{ $employee->name }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ $employee->email }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ $employee->assigned_jobs_count }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ $employee->created_at->format('M d, Y') }}</td>
+                        <td class="px-6 py-4 space-x-2">
+                            <a href="{{ route('admin.users.edit', $employee) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
+                            <form method="POST" action="{{ route('admin.users.destroy', $employee) }}" class="inline" onsubmit="return confirm('Delete {{ $employee->name }}? This cannot be undone.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">No employees found. <a href="{{ route('admin.users.create') }}" class="text-green-600 hover:underline">Register one</a></td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

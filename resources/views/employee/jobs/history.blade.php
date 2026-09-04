@@ -43,42 +43,44 @@
     <div class="px-6 py-4 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-800">All Jobs</h3>
     </div>
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created By</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expense</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Profit</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-            @forelse($jobs as $job)
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-800">{{ $job->project_name }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $job->creator->name }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $job->job_date ? $job->job_date->format('M d, Y h:i A') : '-' }}</td>
-                    <td class="px-6 py-4 text-red-600">KSh {{ number_format($job->expense, 2) }}</td>
-                    <td class="px-6 py-4 text-blue-600">KSh {{ number_format($job->cost, 2) }}</td>
-                    <td class="px-6 py-4 font-semibold {{ $job->profit >= 0 ? 'text-green-600' : 'text-red-600' }}">KSh {{ number_format($job->profit, 2) }}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 text-xs rounded-full font-medium
-                            {{ $job->status === 'completed' ? 'bg-green-100 text-green-800' : '' }}
-                            {{ $job->status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                            {{ $job->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
-                            {{ $job->status_label }}
-                        </span>
-                    </td>
-                </tr>
-            @empty
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
                 <tr>
-                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">No job history found.</td>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created By</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expense</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Profit</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @forelse($jobs as $job)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-800">{{ $job->project_name }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ $job->creator->name }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ $job->job_date ? $job->job_date->format('M d, Y h:i A') : '-' }}</td>
+                        <td class="px-6 py-4 text-red-600">KSh {{ number_format($job->expense, 2) }}</td>
+                        <td class="px-6 py-4 text-blue-600">KSh {{ number_format($job->cost, 2) }}</td>
+                        <td class="px-6 py-4 font-semibold {{ $job->profit >= 0 ? 'text-green-600' : 'text-red-600' }}">KSh {{ number_format($job->profit, 2) }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full font-medium
+                                {{ $job->status === 'completed' ? 'bg-green-100 text-green-800' : '' }}
+                                {{ $job->status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                {{ $job->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
+                                {{ $job->status_label }}
+                            </span>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">No job history found.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection
