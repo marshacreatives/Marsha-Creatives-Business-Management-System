@@ -48,7 +48,7 @@
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project Name</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created By</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expense</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Profit</th>
@@ -60,7 +60,7 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 font-medium text-gray-800">{{ $job->project_name }}</td>
                     <td class="px-6 py-4 text-gray-600">{{ $job->creator->name }}</td>
-                    <td class="px-6 py-4 text-gray-600">{{ $job->created_at->format('M d, Y') }}</td>
+                    <td class="px-6 py-4 text-gray-600">{{ $job->job_date ? $job->job_date->format('M d, Y h:i A') : '-' }}</td>
                     <td class="px-6 py-4 text-red-600">KSh {{ number_format($job->expense, 2) }}</td>
                     <td class="px-6 py-4 text-blue-600">KSh {{ number_format($job->cost, 2) }}</td>
                     <td class="px-6 py-4 font-semibold {{ $job->profit >= 0 ? 'text-green-600' : 'text-red-600' }}">KSh {{ number_format($job->profit, 2) }}</td>

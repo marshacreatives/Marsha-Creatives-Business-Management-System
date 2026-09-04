@@ -17,6 +17,7 @@
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned To</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expense</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
@@ -29,6 +30,7 @@
             @forelse($jobs as $job)
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 font-medium text-gray-800">{{ $job->project_name }}</td>
+                    <td class="px-6 py-4 text-gray-600">{{ $job->job_date ? $job->job_date->format('M d, Y h:i A') : '-' }}</td>
                     <td class="px-6 py-4 text-gray-600">{{ $job->assignee->name }}</td>
                     <td class="px-6 py-4 text-red-600">KSh {{ number_format($job->expense, 2) }}</td>
                     <td class="px-6 py-4 text-blue-600">KSh {{ number_format($job->cost, 2) }}</td>
@@ -52,7 +54,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">No jobs found. <a href="{{ route('admin.jobs.create') }}" class="text-blue-600 hover:underline">Create one</a></td>
+                    <td colspan="8" class="px-6 py-8 text-center text-gray-500">No jobs found. <a href="{{ route('admin.jobs.create') }}" class="text-blue-600 hover:underline">Create one</a></td>
                 </tr>
             @endforelse
         </tbody>

@@ -17,6 +17,7 @@
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expense</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Profit</th>
@@ -29,8 +30,9 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4">
                         <span class="font-medium text-gray-800">{{ $job->project_name }}</span>
-                        <p class="text-xs text-gray-400">by {{ $job->creator->name }} &middot; {{ $job->created_at->diffForHumans() }}</p>
+                        <p class="text-xs text-gray-400">by {{ $job->creator->name }}</p>
                     </td>
+                    <td class="px-6 py-4 text-gray-600">{{ $job->job_date ? $job->job_date->format('M d, Y h:i A') : '-' }}</td>
                     <td class="px-6 py-4 text-red-600">KSh {{ number_format($job->expense, 2) }}</td>
                     <td class="px-6 py-4 text-blue-600">KSh {{ number_format($job->cost, 2) }}</td>
                     <td class="px-6 py-4 font-semibold {{ $job->profit >= 0 ? 'text-green-600' : 'text-red-600' }}">KSh {{ number_format($job->profit, 2) }}</td>
@@ -56,7 +58,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">No jobs found. <a href="{{ route('employee.jobs.create') }}" class="text-blue-600 hover:underline">Log one</a></td>
+                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">No jobs found. <a href="{{ route('employee.jobs.create') }}" class="text-blue-600 hover:underline">Log one</a></td>
                 </tr>
             @endforelse
         </tbody>

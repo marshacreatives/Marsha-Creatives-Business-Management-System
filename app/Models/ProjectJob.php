@@ -16,6 +16,7 @@ class ProjectJob extends Model
         'status',
         'assigned_to',
         'created_by',
+        'job_date',
     ];
 
     protected function casts(): array
@@ -23,6 +24,7 @@ class ProjectJob extends Model
         return [
             'expense' => 'decimal:2',
             'cost' => 'decimal:2',
+            'job_date' => 'datetime',
         ];
     }
 

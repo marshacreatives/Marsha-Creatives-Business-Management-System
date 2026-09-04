@@ -9,6 +9,7 @@ use App\Models\CompanyBalance;
 use App\Models\FundRequest;
 use App\Models\ProjectJob;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class JobController extends Controller
 {
@@ -79,6 +80,7 @@ class JobController extends Controller
             'status' => $request->status,
             'assigned_to' => $user->id,
             'created_by' => $user->id,
+            'job_date' => Carbon::now(),
         ]);
 
         CompanyBalance::adjustBalance(-$expense);
