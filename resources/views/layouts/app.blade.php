@@ -78,7 +78,7 @@
                         <a href="{{ route('employee.jobs.create') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.create') ? 'bg-white/20 text-white' : '' }}">Log Job</a>
                         <a href="{{ route('employee.jobs.history') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.history') ? 'bg-white/20 text-white' : '' }}">History</a>
                     @endif
-                    <button type="button" id="installPwaBtnMobile" class="hidden items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">
+                    <button type="button" id="installPwaBtnMobile" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">
                         <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
                         Install App
                     </button>
@@ -132,11 +132,9 @@
             var offlineBadge = document.getElementById('offlineBadge');
 
             function showInstallButtons() {
-                if (!installBtn || !installBtnMobile) return;
+                if (!installBtn) return;
                 installBtn.classList.remove('hidden');
                 installBtn.classList.add('inline-flex');
-                installBtnMobile.classList.remove('hidden');
-                installBtnMobile.classList.add('flex');
             }
 
             window.addEventListener('beforeinstallprompt', function (e) {
@@ -165,6 +163,11 @@
                 if (installBtn) installBtn.classList.add('hidden');
                 if (installBtnMobile) installBtnMobile.classList.add('hidden');
             });
+
+            // Hide mobile install button if already running as an installed PWA
+            if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) {
+                if (installBtnMobile) installBtnMobile.classList.add('hidden');
+            }
 
             // Online/offline indicator
             function updateOnline() {
