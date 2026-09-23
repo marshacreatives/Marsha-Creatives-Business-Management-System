@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SecurityAlert extends Model
 {
@@ -55,7 +54,7 @@ class SecurityAlert extends Model
 
     public function getSeverityColorAttribute(): string
     {
-        return match($this->severity) {
+        return match ($this->severity) {
             'critical' => '#dc3545',
             'high' => '#fd7e14',
             'medium' => '#ffc107',
@@ -67,7 +66,7 @@ class SecurityAlert extends Model
 
     public function getSeverityBadgeAttribute(): string
     {
-        return match($this->severity) {
+        return match ($this->severity) {
             'critical' => 'bg-red-500',
             'high' => 'bg-orange-500',
             'medium' => 'bg-yellow-500',

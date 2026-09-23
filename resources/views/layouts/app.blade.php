@@ -30,9 +30,21 @@
                             <a href="{{ route('admin.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
                             <a href="{{ route('security.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('security.*') ? 'bg-white/20 text-white' : '' }}">Security</a>
                             <a href="{{ route('admin.balance') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.balance*') ? 'bg-white/20 text-white' : '' }}">Balance</a>
-                            <a href="{{ route('admin.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.jobs*') ? 'bg-white/20 text-white' : '' }}">Jobs</a>
+<a href="{{ route('admin.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.jobs*') ? 'bg-white/20 text-white' : '' }}">Jobs</a>
+                            <div class="relative group">
+                                <a href="{{ route('admin.documents.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.documents*') || request()->routeIs('admin.items*') ? 'bg-white/20 text-white' : '' }}">Documents</a>
+                                <div class="absolute left-0 top-full pt-1 hidden group-hover:block z-50">
+                                    <div class="bg-white rounded-md shadow-lg py-1 w-48">
+                                        <a href="{{ route('admin.documents.index', ['type' => 'invoice']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Invoices</a>
+                                        <a href="{{ route('admin.documents.index', ['type' => 'quote']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Quotes</a>
+                                        <a href="{{ route('admin.documents.index', ['type' => 'receipt']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Receipts</a>
+                                        <a href="{{ route('admin.items.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Items</a>
+                                    </div>
+                                </div>
+                            </div>
                             <a href="{{ route('admin.users.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.users*') ? 'bg-white/20 text-white' : '' }}">Employees</a>
                             <a href="{{ route('admin.financials') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.financials') ? 'bg-white/20 text-white' : '' }}">Financials</a>
+                            <a href="{{ route('admin.wordpress.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.wordpress*') ? 'bg-white/20 text-white' : '' }}">WordPress</a>
                             <button type="button" id="installPwaBtn" class="hidden items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium" aria-label="Install App">
                                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
                                 Install App
@@ -41,7 +53,18 @@
                             <a href="{{ route('employee.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
                             <a href="{{ route('employee.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs*') ? 'bg-white/20 text-white' : '' }}">My Jobs</a>
                             <a href="{{ route('employee.jobs.create') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.create') ? 'bg-white/20 text-white' : '' }}">Log Job</a>
-                            <a href="{{ route('employee.jobs.history') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.history') ? 'bg-white/20 text-white' : '' }}">History</a>
+<a href="{{ route('employee.jobs.history') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.history') ? 'bg-white/20 text-white' : '' }}">History</a>
+                            <div class="relative group">
+                                <a href="{{ route('employee.documents.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.documents*') || request()->routeIs('employee.items*') ? 'bg-white/20 text-white' : '' }}">Documents</a>
+                                <div class="absolute left-0 top-full pt-1 hidden group-hover:block z-50">
+                                    <div class="bg-white rounded-md shadow-lg py-1 w-48">
+                                        <a href="{{ route('employee.documents.index', ['type' => 'invoice']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Invoices</a>
+                                        <a href="{{ route('employee.documents.index', ['type' => 'quote']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Quotes</a>
+                                        <a href="{{ route('employee.documents.index', ['type' => 'receipt']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Receipts</a>
+                                        <a href="{{ route('employee.items.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Items</a>
+                                    </div>
+                                </div>
+                            </div>
                             <button type="button" id="installPwaBtn" class="hidden items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium" aria-label="Install App">
                                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
                                 Install App
@@ -69,14 +92,29 @@
                         <a href="{{ route('admin.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
                         <a href="{{ route('security.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('security.*') ? 'bg-white/20 text-white' : '' }}">Security</a>
                         <a href="{{ route('admin.balance') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.balance*') ? 'bg-white/20 text-white' : '' }}">Balance</a>
-                        <a href="{{ route('admin.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.jobs*') ? 'bg-white/20 text-white' : '' }}">Jobs</a>
+<a href="{{ route('admin.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.jobs*') ? 'bg-white/20 text-white' : '' }}">Jobs</a>
+                        <a href="{{ route('admin.documents.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.documents*') || request()->routeIs('admin.items*') ? 'bg-white/20 text-white' : '' }}">Documents</a>
+                        <div class="pl-6 flex flex-col">
+                            <a href="{{ route('admin.documents.index', ['type' => 'invoice']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Invoices</a>
+                            <a href="{{ route('admin.documents.index', ['type' => 'quote']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Quotes</a>
+                            <a href="{{ route('admin.documents.index', ['type' => 'receipt']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Receipts</a>
+                            <a href="{{ route('admin.items.index') }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Items</a>
+                        </div>
                         <a href="{{ route('admin.users.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.users*') ? 'bg-white/20 text-white' : '' }}">Employees</a>
                         <a href="{{ route('admin.financials') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.financials') ? 'bg-white/20 text-white' : '' }}">Financials</a>
+                        <a href="{{ route('admin.wordpress.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.wordpress*') ? 'bg-white/20 text-white' : '' }}">WordPress</a>
                     @else
                         <a href="{{ route('employee.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
                         <a href="{{ route('employee.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs*') ? 'bg-white/20 text-white' : '' }}">My Jobs</a>
                         <a href="{{ route('employee.jobs.create') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.create') ? 'bg-white/20 text-white' : '' }}">Log Job</a>
                         <a href="{{ route('employee.jobs.history') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.history') ? 'bg-white/20 text-white' : '' }}">History</a>
+                        <a href="{{ route('employee.documents.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.documents*') || request()->routeIs('employee.items*') ? 'bg-white/20 text-white' : '' }}">Documents</a>
+                        <div class="pl-6 flex flex-col">
+                            <a href="{{ route('employee.documents.index', ['type' => 'invoice']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Invoices</a>
+                            <a href="{{ route('employee.documents.index', ['type' => 'quote']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Quotes</a>
+                            <a href="{{ route('employee.documents.index', ['type' => 'receipt']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Receipts</a>
+                            <a href="{{ route('employee.items.index') }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Items</a>
+                        </div>
                     @endif
                     <button type="button" id="installPwaBtnMobile" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">
                         <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
@@ -106,6 +144,8 @@
 
         @yield('content')
     </main>
+
+    @yield('scripts')
 
     <script>
         (function () {

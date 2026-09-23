@@ -64,12 +64,14 @@ class IPBlockController extends Controller
     {
         $block->unblock();
         $this->telegram->sendUnblocked($block->ip);
+
         return redirect()->route('security.blocks.index')->with('success', "IP {$block->ip} unblocked.");
     }
 
     public function destroy(BlockedIP $block)
     {
         $block->delete();
+
         return redirect()->route('security.blocks.index')->with('success', 'Block record deleted.');
     }
 }

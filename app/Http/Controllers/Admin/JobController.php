@@ -35,6 +35,7 @@ class JobController extends Controller
     {
         $employees = User::where('role', 'employee')->get();
         $balance = CompanyBalance::getBalance();
+
         return view('admin.jobs.create', compact('employees', 'balance'));
     }
 
@@ -66,7 +67,7 @@ class JobController extends Controller
         Activity::create([
             'user_id' => auth()->id(),
             'type' => 'job_created',
-            'description' => "Created job '{$request->project_name}' assigned to {$assignee->name} (Expense: KSh " . number_format($expense, 2) . ")",
+            'description' => "Created job '{$request->project_name}' assigned to {$assignee->name} (Expense: KSh ".number_format($expense, 2).')',
             'subject_id' => $job->id,
             'subject_type' => ProjectJob::class,
         ]);
@@ -78,6 +79,7 @@ class JobController extends Controller
     {
         $employees = User::where('role', 'employee')->get();
         $balance = CompanyBalance::getBalance();
+
         return view('admin.jobs.edit', compact('job', 'employees', 'balance'));
     }
 

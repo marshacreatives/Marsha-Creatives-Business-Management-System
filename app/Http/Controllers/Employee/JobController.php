@@ -39,6 +39,7 @@ class JobController extends Controller
     public function create()
     {
         $balance = CompanyBalance::getBalance();
+
         return view('employee.jobs.create', compact('balance'));
     }
 
@@ -60,17 +61,17 @@ class JobController extends Controller
             FundRequest::create([
                 'user_id' => $user->id,
                 'amount' => $expense - $balance,
-                'message' => "Insufficient funds for job '{$request->project_name}'. Expense: KSh " . number_format($expense, 2) . ", Available: KSh " . number_format($balance, 2),
+                'message' => "Insufficient funds for job '{$request->project_name}'. Expense: KSh ".number_format($expense, 2).', Available: KSh '.number_format($balance, 2),
             ]);
 
             Activity::create([
                 'user_id' => $user->id,
                 'type' => 'fund_requested',
-                'description' => "{$user->name} requested KSh " . number_format($expense - $balance, 2) . " additional funds for job '{$request->project_name}'",
+                'description' => "{$user->name} requested KSh ".number_format($expense - $balance, 2)." additional funds for job '{$request->project_name}'",
             ]);
 
             return redirect()->route('employee.jobs.create')
-                ->with('error', "Insufficient funds! Your expense of KSh " . number_format($expense, 2) . " exceeds the available balance of KSh " . number_format($balance, 2) . ". A fund request has been sent to the admin.");
+                ->with('error', 'Insufficient funds! Your expense of KSh '.number_format($expense, 2).' exceeds the available balance of KSh '.number_format($balance, 2).'. A fund request has been sent to the admin.');
         }
 
         $job = ProjectJob::create([
@@ -88,12 +89,12 @@ class JobController extends Controller
         Activity::create([
             'user_id' => $user->id,
             'type' => 'job_created',
-            'description' => "Logged new job '{$request->project_name}' (Expense: KSh " . number_format($expense, 2) . ")",
+            'description' => "Logged new job '{$request->project_name}' (Expense: KSh ".number_format($expense, 2).')',
             'subject_id' => $job->id,
             'subject_type' => ProjectJob::class,
         ]);
 
-        return redirect()->route('employee.jobs.index')->with('success', 'Job logged successfully. KSh ' . number_format($expense, 2) . ' deducted from company balance.');
+        return redirect()->route('employee.jobs.index')->with('success', 'Job logged successfully. KSh '.number_format($expense, 2).' deducted from company balance.');
     }
 
     public function updateStatus(Request $request, ProjectJob $job)
@@ -108,10 +109,10 @@ class JobController extends Controller
         $newStatus = $request->status;
 
         if ($oldStatus === $newStatus) {
-            return redirect()->route('employee.jobs.index')->with('success', 'Job status is already ' . str_replace('_', ' ', $newStatus) . '.');
+            return redirect()->route('employee.jobs.index')->with('success', 'Job status is already '.str_replace('_', ' ', $newStatus).'.');
         }
 
-        $activityDesc = "Updated '{$job->project_name}' status to " . str_replace('_', ' ', $newStatus);
+        $activityDesc = "Updated '{$job->project_name}' status to ".str_replace('_', ' ', $newStatus);
 
         $job->update(['status' => $newStatus]);
 

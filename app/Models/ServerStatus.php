@@ -52,12 +52,13 @@ class ServerStatus extends Model
         if ($days > 0) {
             return "{$days}d {$hours}h {$minutes}m";
         }
+
         return "{$hours}h {$minutes}m";
     }
 
     public function getCpuStatusAttribute(): string
     {
-        return match(true) {
+        return match (true) {
             $this->cpu_usage >= 90 => 'critical',
             $this->cpu_usage >= 70 => 'warning',
             default => 'healthy',
@@ -66,7 +67,7 @@ class ServerStatus extends Model
 
     public function getRamStatusAttribute(): string
     {
-        return match(true) {
+        return match (true) {
             $this->ram_usage >= 90 => 'critical',
             $this->ram_usage >= 75 => 'warning',
             default => 'healthy',
@@ -75,7 +76,7 @@ class ServerStatus extends Model
 
     public function getDiskStatusAttribute(): string
     {
-        return match(true) {
+        return match (true) {
             $this->disk_usage >= 95 => 'critical',
             $this->disk_usage >= 85 => 'warning',
             default => 'healthy',

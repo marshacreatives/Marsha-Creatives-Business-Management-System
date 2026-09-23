@@ -12,7 +12,7 @@ class AgentApiMiddleware
     {
         $expectedKey = config('security.agent_api_key');
 
-        if (!$expectedKey) {
+        if (! $expectedKey) {
             return response()->json([
                 'success' => false,
                 'message' => 'AGENT_API_KEY not configured on server',
@@ -21,7 +21,7 @@ class AgentApiMiddleware
 
         $providedKey = $request->header('X-Agent-Key');
 
-        if (!$providedKey || !hash_equals($expectedKey, $providedKey)) {
+        if (! $providedKey || ! hash_equals($expectedKey, $providedKey)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized - invalid agent API key',

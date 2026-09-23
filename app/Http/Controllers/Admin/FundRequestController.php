@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\FundRequest;
-use Illuminate\Http\Request;
 
 class FundRequestController extends Controller
 {
@@ -20,7 +19,7 @@ class FundRequestController extends Controller
         Activity::create([
             'user_id' => auth()->id(),
             'type' => 'fund_request_approved',
-            'description' => "Approved fund request from {$fundRequest->user->name} for KSh " . number_format($fundRequest->amount, 2),
+            'description' => "Approved fund request from {$fundRequest->user->name} for KSh ".number_format($fundRequest->amount, 2),
         ]);
 
         return back()->with('success', 'Fund request approved. Please update the company balance.');
@@ -37,7 +36,7 @@ class FundRequestController extends Controller
         Activity::create([
             'user_id' => auth()->id(),
             'type' => 'fund_request_dismissed',
-            'description' => "Dismissed fund request from {$fundRequest->user->name} for KSh " . number_format($fundRequest->amount, 2),
+            'description' => "Dismissed fund request from {$fundRequest->user->name} for KSh ".number_format($fundRequest->amount, 2),
         ]);
 
         return back()->with('success', 'Fund request dismissed.');

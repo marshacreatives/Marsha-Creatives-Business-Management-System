@@ -21,7 +21,7 @@ class AgentActionController extends Controller
         }
 
         if ($request->filled('resource')) {
-            $query->where('resource', 'like', '%' . $request->input('resource') . '%');
+            $query->where('resource', 'like', '%'.$request->input('resource').'%');
         }
 
         if ($request->filled('date_from')) {
@@ -29,7 +29,7 @@ class AgentActionController extends Controller
         }
 
         if ($request->filled('date_to')) {
-            $query->where('performed_at', '<=', $request->input('date_to') . ' 23:59:59');
+            $query->where('performed_at', '<=', $request->input('date_to').' 23:59:59');
         }
 
         $actions = $query->latest('performed_at')->paginate(25)->withQueryString();

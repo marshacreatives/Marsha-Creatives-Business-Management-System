@@ -33,7 +33,7 @@ class AlertController extends Controller
         }
 
         if ($request->filled('date_to')) {
-            $query->where('occurred_at', '<=', $request->input('date_to') . ' 23:59:59');
+            $query->where('occurred_at', '<=', $request->input('date_to').' 23:59:59');
         }
 
         $alerts = $query->latest('occurred_at')->paginate(25)->withQueryString();
@@ -52,18 +52,21 @@ class AlertController extends Controller
     public function resolve(SecurityAlert $alert)
     {
         $alert->update(['is_resolved' => true]);
+
         return back()->with('success', 'Alert marked as resolved.');
     }
 
     public function reopen(SecurityAlert $alert)
     {
         $alert->update(['is_resolved' => false]);
+
         return back()->with('success', 'Alert reopened.');
     }
 
     public function destroy(SecurityAlert $alert)
     {
         $alert->delete();
+
         return redirect()->route('security.alerts.index')->with('success', 'Alert deleted.');
     }
 }

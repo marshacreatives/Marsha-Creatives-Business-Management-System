@@ -65,7 +65,7 @@ class BalanceController extends Controller
         Activity::create([
             'user_id' => auth()->id(),
             'type' => 'balance_updated',
-            'description' => 'Company balance set to KSh ' . number_format($newBalance, 2),
+            'description' => 'Company balance set to KSh '.number_format($newBalance, 2),
         ]);
 
         return redirect()->route('admin.balance')->with('success', 'Balance updated successfully.');
@@ -95,9 +95,9 @@ class BalanceController extends Controller
         Activity::create([
             'user_id' => auth()->id(),
             'type' => 'balance_updated',
-            'description' => 'Added KSh ' . number_format($amount, 2) . ' to company balance',
+            'description' => 'Added KSh '.number_format($amount, 2).' to company balance',
         ]);
 
-        return redirect()->route('admin.balance')->with('success', 'KSh ' . number_format($amount, 2) . ' added to balance successfully.');
+        return redirect()->route('admin.balance')->with('success', 'KSh '.number_format($amount, 2).' added to balance successfully.');
     }
 }

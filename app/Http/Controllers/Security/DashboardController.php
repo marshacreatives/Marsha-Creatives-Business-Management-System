@@ -8,7 +8,6 @@ use App\Models\AgentLog;
 use App\Models\BlockedIP;
 use App\Models\SecurityAlert;
 use App\Models\ServerStatus;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {

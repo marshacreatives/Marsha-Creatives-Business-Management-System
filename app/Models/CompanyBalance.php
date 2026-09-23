@@ -22,6 +22,7 @@ class CompanyBalance extends Model
     public static function getBalance(): float
     {
         $record = static::firstOrCreate([], ['balance' => 0]);
+
         return (float) $record->balance;
     }
 
@@ -36,6 +37,7 @@ class CompanyBalance extends Model
         $record = static::firstOrCreate([], ['balance' => 0]);
         $newBalance = (float) $record->balance + $adjustment;
         $record->update(['balance' => $newBalance]);
+
         return $newBalance;
     }
 }

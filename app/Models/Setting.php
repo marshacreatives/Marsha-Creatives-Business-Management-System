@@ -19,11 +19,11 @@ class Setting extends Model
     {
         $setting = static::where('key', $key)->first();
 
-        if (!$setting) {
+        if (! $setting) {
             return $default;
         }
 
-        return match($setting->type) {
+        return match ($setting->type) {
             'boolean' => (bool) $setting->value,
             'integer' => (int) $setting->value,
             'float' => (float) $setting->value,

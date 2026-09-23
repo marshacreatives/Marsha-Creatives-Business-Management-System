@@ -36,7 +36,7 @@ class AgentAction extends Model
 
     public function getSeverityBadgeAttribute(): string
     {
-        return match($this->severity) {
+        return match ($this->severity) {
             'critical' => 'bg-red-500',
             'high' => 'bg-orange-500',
             'medium' => 'bg-yellow-500',

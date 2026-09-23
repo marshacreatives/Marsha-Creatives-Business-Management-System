@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
-use App\Models\CompanyBalance;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\Controller;
 
 class LoginController extends Controller
 {
@@ -16,6 +13,7 @@ class LoginController extends Controller
         if (Auth::check()) {
             return $this->redirectByRole();
         }
+
         return view('auth.login');
     }
 
@@ -28,6 +26,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+
             return $this->redirectByRole();
         }
 
@@ -41,6 +40,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('login');
     }
 
@@ -49,6 +49,7 @@ class LoginController extends Controller
         if (Auth::user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
+
         return redirect()->route('employee.dashboard');
     }
 }

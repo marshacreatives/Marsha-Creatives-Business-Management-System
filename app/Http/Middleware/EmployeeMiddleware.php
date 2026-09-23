@@ -10,7 +10,7 @@ class EmployeeMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->isEmployee()) {
+        if (! auth()->check() || ! auth()->user()->isEmployee()) {
             abort(403, 'Unauthorized. Employee access required.');
         }
 

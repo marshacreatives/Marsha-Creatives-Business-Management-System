@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 class TelegramService
 {
     protected ?string $token = null;
+
     protected ?string $chatId = null;
 
     public function __construct()
@@ -18,12 +19,12 @@ class TelegramService
 
     public function isEnabled(): bool
     {
-        return !empty($this->token) && !empty($this->chatId);
+        return ! empty($this->token) && ! empty($this->chatId);
     }
 
     public function sendMessage(string $message, string $parseMode = 'Markdown'): bool
     {
-        if (!$this->isEnabled()) {
+        if (! $this->isEnabled()) {
             return false;
         }
 
@@ -39,13 +40,14 @@ class TelegramService
             return $response->successful();
         } catch (\Exception $e) {
             Log::error("Telegram send failed: {$e->getMessage()}");
+
             return false;
         }
     }
 
     public function sendAlert(array $alert): bool
     {
-        if (!$this->isEnabled()) {
+        if (! $this->isEnabled()) {
             return false;
         }
 
@@ -58,24 +60,24 @@ class TelegramService
             default => '⚪',
         };
 
-        $message = "{$emoji} *SECURITY ALERT: " . strtoupper($alert['type'] ?? 'unknown') . "*\n";
-        $message .= "*Severity:* " . strtoupper($severity) . "\n";
+        $message = "{$emoji} *SECURITY ALERT: ".strtoupper($alert['type'] ?? 'unknown')."*\n";
+        $message .= '*Severity:* '.strtoupper($severity)."\n";
 
-        if (!empty($alert['source_ip'])) {
+        if (! empty($alert['source_ip'])) {
             $message .= "*Source IP:* `{$alert['source_ip']}`\n";
         }
 
-        $message .= "*Description:* " . ($alert['description'] ?? '') . "\n";
+        $message .= '*Description:* '.($alert['description'] ?? '')."\n";
 
-        if (!empty($alert['action_taken'])) {
+        if (! empty($alert['action_taken'])) {
             $message .= "*Action:* {$alert['action_taken']}\n";
         }
 
-        if (!empty($alert['server_name'])) {
+        if (! empty($alert['server_name'])) {
             $message .= "*Server:* {$alert['server_name']}\n";
         }
 
-        $message .= "*Time:* " . now()->format('Y-m-d H:i:s');
+        $message .= '*Time:* '.now()->format('Y-m-d H:i:s');
 
         return $this->sendMessage($message);
     }
@@ -83,33 +85,35 @@ class TelegramService
     public function sendBlocked(string $ip, string $reason, ?string $serverName = null): bool
     {
         $server = $serverName ? "\n*Server:* {$serverName}" : '';
+
         return $this->sendMessage(
-            "🚫 *IP BLOCKED:* `{$ip}`\n*Reason:* {$reason}\n*Time:* " . now()->format('Y-m-d H:i:s') . $server
+            "🚫 *IP BLOCKED:* `{$ip}`\n*Reason:* {$reason}\n*Time:* ".now()->format('Y-m-d H:i:s').$server
         );
     }
 
     public function sendUnblocked(string $ip, ?string $serverName = null): bool
     {
         $server = $serverName ? "\n*Server:* {$serverName}" : '';
+
         return $this->sendMessage(
-            "✅ *IP UNBLOCKED:* `{$ip}`\n*Time:* " . now()->format('Y-m-d H:i:s') . $server
+            "✅ *IP UNBLOCKED:* `{$ip}`\n*Time:* ".now()->format('Y-m-d H:i:s').$server
         );
     }
 
     public function sendDailySummary(array $stats): bool
     {
-        if (!$this->isEnabled()) {
+        if (! $this->isEnabled()) {
             return false;
         }
 
         $message = "📊 *DAILY SECURITY SUMMARY*\n";
-        $message .= "*Date:* " . now()->format('Y-m-d') . "\n\n";
+        $message .= '*Date:* '.now()->format('Y-m-d')."\n\n";
         $message .= "*Total Alerts (24h):* {$stats['total_alerts']}\n";
         $message .= "*Critical:* {$stats['critical']}\n";
         $message .= "*High:* {$stats['high']}\n";
         $message .= "*Medium:* {$stats['medium']}\n";
         $message .= "*IPS Blocked (Active):* {$stats['active_blocks']}\n\n";
-        $message .= "Full report available on the dashboard.";
+        $message .= 'Full report available on the dashboard.';
 
         return $this->sendMessage($message);
     }

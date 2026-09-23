@@ -2,8 +2,8 @@
 
 namespace App\Http\Traits;
 
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 trait MonthFilter
 {
