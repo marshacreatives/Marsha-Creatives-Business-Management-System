@@ -33,9 +33,3 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
-
-# WordPress plugin archives for the Quick Setup automation.
-# Drop plugin .zip files here and they are uploaded + activated on every setup run.
-# Purchase/licensed plugins are kept out of version control.
-plugins/*
-!plugins/.gitkeep

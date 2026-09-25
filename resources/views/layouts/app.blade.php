@@ -17,158 +17,161 @@
         .gradient-bg { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); }
         .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .chevron { transition: transform 0.2s; }
+        details[open] > summary .chevron { transform: rotate(180deg); }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <nav class="gradient-bg shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <img src="{{ asset('images/header_logo.png') }}" alt="Marsha Creatives" class="h-12">
-                    <div class="hidden md:flex ml-10 space-x-1">
-                        @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
-                            <a href="{{ route('security.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('security.*') ? 'bg-white/20 text-white' : '' }}">Security</a>
-                            <a href="{{ route('admin.balance') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.balance*') ? 'bg-white/20 text-white' : '' }}">Balance</a>
-<a href="{{ route('admin.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.jobs*') ? 'bg-white/20 text-white' : '' }}">Jobs</a>
-                            <div class="relative group">
-                                <a href="{{ route('admin.documents.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.documents*') || request()->routeIs('admin.items*') ? 'bg-white/20 text-white' : '' }}">Documents</a>
-                                <div class="absolute left-0 top-full pt-1 hidden group-hover:block z-50">
-                                    <div class="bg-white rounded-md shadow-lg py-1 w-48">
-                                        <a href="{{ route('admin.documents.index', ['type' => 'invoice']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Invoices</a>
-                                        <a href="{{ route('admin.documents.index', ['type' => 'quote']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Quotes</a>
-                                        <a href="{{ route('admin.documents.index', ['type' => 'receipt']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Receipts</a>
-                                        <a href="{{ route('admin.items.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Items</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="{{ route('admin.users.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.users*') ? 'bg-white/20 text-white' : '' }}">Employees</a>
-                            <a href="{{ route('admin.financials') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.financials') ? 'bg-white/20 text-white' : '' }}">Financials</a>
-                            <a href="{{ route('admin.wordpress.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.wordpress*') ? 'bg-white/20 text-white' : '' }}">WordPress</a>
-                            <button type="button" id="installPwaBtn" class="hidden items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium" aria-label="Install App">
-                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
-                                Install App
-                            </button>
-                        @else
-                            <a href="{{ route('employee.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
-                            <a href="{{ route('employee.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs*') ? 'bg-white/20 text-white' : '' }}">My Jobs</a>
-                            <a href="{{ route('employee.jobs.create') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.create') ? 'bg-white/20 text-white' : '' }}">Log Job</a>
-<a href="{{ route('employee.jobs.history') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.history') ? 'bg-white/20 text-white' : '' }}">History</a>
-                            <div class="relative group">
-                                <a href="{{ route('employee.documents.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.documents*') || request()->routeIs('employee.items*') ? 'bg-white/20 text-white' : '' }}">Documents</a>
-                                <div class="absolute left-0 top-full pt-1 hidden group-hover:block z-50">
-                                    <div class="bg-white rounded-md shadow-lg py-1 w-48">
-                                        <a href="{{ route('employee.documents.index', ['type' => 'invoice']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Invoices</a>
-                                        <a href="{{ route('employee.documents.index', ['type' => 'quote']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Quotes</a>
-                                        <a href="{{ route('employee.documents.index', ['type' => 'receipt']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Receipts</a>
-                                        <a href="{{ route('employee.items.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Items</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" id="installPwaBtn" class="hidden items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium" aria-label="Install App">
-                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
-                                Install App
-                            </button>
-                        @endif
+    <!-- Sidebar overlay (mobile) -->
+    <div id="sidebarOverlay" class="fixed inset-0 z-30 bg-black/40 hidden lg:hidden" aria-hidden="true"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="gradient-bg fixed inset-y-0 left-0 w-64 z-40 flex flex-col overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+        <div class="flex items-center justify-between px-4 h-16 shrink-0">
+            <img src="{{ asset('images/header_logo.png') }}" alt="Marsha Creatives" class="h-12">
+            <button type="button" id="sidebarCloseBtn" class="lg:hidden text-gray-300 hover:text-white focus:outline-none" aria-label="Close menu">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <nav class="flex-1 px-3 py-4 space-y-1">
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
+                <a href="{{ route('security.dashboard') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('security.*') ? 'bg-white/20 text-white' : '' }}">Security</a>
+                <a href="{{ route('admin.balance') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.balance*') ? 'bg-white/20 text-white' : '' }}">Balance</a>
+                <a href="{{ route('admin.jobs.index') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.jobs*') ? 'bg-white/20 text-white' : '' }}">Jobs</a>
+
+                <details class="group">
+                    <summary class="flex items-center justify-between cursor-pointer text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.documents*') || request()->routeIs('admin.items*') ? 'bg-white/20 text-white' : '' }}">
+                        <span>Documents</span>
+                        <svg class="chevron w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="pl-6 flex flex-col mt-1">
+                        <a href="{{ route('admin.documents.index', ['type' => 'invoice']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium {{ request()->fullUrlIs(route('admin.documents.index', ['type' => 'invoice'])) ? 'bg-white/10 text-white' : '' }}">Invoices</a>
+                        <a href="{{ route('admin.documents.index', ['type' => 'quote']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium {{ request()->fullUrlIs(route('admin.documents.index', ['type' => 'quote'])) ? 'bg-white/10 text-white' : '' }}">Quotes</a>
+                        <a href="{{ route('admin.documents.index', ['type' => 'receipt']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium {{ request()->fullUrlIs(route('admin.documents.index', ['type' => 'receipt'])) ? 'bg-white/10 text-white' : '' }}">Receipts</a>
+                        <a href="{{ route('admin.items.index') }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium {{ request()->routeIs('admin.items*') ? 'bg-white/10 text-white' : '' }}">Items</a>
+                    </div>
+                </details>
+
+                <a href="{{ route('admin.users.index') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.users*') ? 'bg-white/20 text-white' : '' }}">Employees</a>
+                <a href="{{ route('admin.financials') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.financials') ? 'bg-white/20 text-white' : '' }}">Financials</a>
+            @else
+                <a href="{{ route('employee.dashboard') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
+                <a href="{{ route('employee.jobs.index') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs*') ? 'bg-white/20 text-white' : '' }}">My Jobs</a>
+                <a href="{{ route('employee.jobs.create') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.create') ? 'bg-white/20 text-white' : '' }}">Log Job</a>
+                <a href="{{ route('employee.jobs.history') }}" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.history') ? 'bg-white/20 text-white' : '' }}">History</a>
+
+                <details class="group">
+                    <summary class="flex items-center justify-between cursor-pointer text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.documents*') || request()->routeIs('employee.items*') ? 'bg-white/20 text-white' : '' }}">
+                        <span>Documents</span>
+                        <svg class="chevron w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="pl-6 flex flex-col mt-1">
+                        <a href="{{ route('employee.documents.index', ['type' => 'invoice']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium {{ request()->fullUrlIs(route('employee.documents.index', ['type' => 'invoice'])) ? 'bg-white/10 text-white' : '' }}">Invoices</a>
+                        <a href="{{ route('employee.documents.index', ['type' => 'quote']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium {{ request()->fullUrlIs(route('employee.documents.index', ['type' => 'quote'])) ? 'bg-white/10 text-white' : '' }}">Quotes</a>
+                        <a href="{{ route('employee.documents.index', ['type' => 'receipt']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium {{ request()->fullUrlIs(route('employee.documents.index', ['type' => 'receipt'])) ? 'bg-white/10 text-white' : '' }}">Receipts</a>
+                        <a href="{{ route('employee.items.index') }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium {{ request()->routeIs('employee.items*') ? 'bg-white/10 text-white' : '' }}">Items</a>
+                    </div>
+                </details>
+            @endif
+
+            <button type="button" id="installPwaBtn"
+                class="hidden items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium" aria-label="Install App">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
+                Install App
+            </button>
+        </nav>
+
+        <div class="p-3 border-t border-white/10 shrink-0">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full text-left text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">Logout</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main column -->
+    <div class="lg:pl-64 flex flex-col min-h-screen">
+        <header class="gradient-bg shadow-lg sticky top-0 z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center">
+                    <div class="flex items-center">
+                        <button type="button" id="mobileMenuBtn" class="lg:hidden text-gray-300 hover:text-white focus:outline-none" aria-label="Toggle menu">
+                            <svg id="mobileMenuIcon" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-4 ml-auto">
+                        <span id="offlineBadge" class="hidden px-2 py-1 text-xs rounded-full bg-red-500 text-white">Offline</span>
+                        <span class="text-gray-300 text-sm">{{ auth()->user()->name }}</span>
+                        <span class="px-2 py-1 text-xs rounded-full {{ auth()->user()->isAdmin() ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white' }}">{{ ucfirst(auth()->user()->role) }}</span>
+                        <form method="POST" action="{{ route('logout') }}" class="hidden lg:block">
+                            @csrf
+                            <button type="submit" class="text-gray-300 hover:text-white text-sm">Logout</button>
+                        </form>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <span id="offlineBadge" class="hidden px-2 py-1 text-xs rounded-full bg-red-500 text-white">Offline</span>
-                    <span class="text-gray-300 text-sm">{{ auth()->user()->name }}</span>
-                    <span class="px-2 py-1 text-xs rounded-full {{ auth()->user()->isAdmin() ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white' }}">{{ ucfirst(auth()->user()->role) }}</span>
-                    <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
-                        @csrf
-                        <button type="submit" class="text-gray-300 hover:text-white text-sm">Logout</button>
-                    </form>
-                    <button type="button" id="mobileMenuBtn" class="md:hidden text-gray-300 hover:text-white focus:outline-none" aria-label="Toggle menu">
-                        <svg id="mobileMenuIcon" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    </button>
+            </div>
+        </header>
+
+        <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                    {{ session('success') }}
                 </div>
-            </div>
+            @endif
 
-            <div id="mobileMenu" class="md:hidden hidden pb-4">
-                <div class="flex flex-col space-y-1">
-                    @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
-                        <a href="{{ route('security.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('security.*') ? 'bg-white/20 text-white' : '' }}">Security</a>
-                        <a href="{{ route('admin.balance') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.balance*') ? 'bg-white/20 text-white' : '' }}">Balance</a>
-<a href="{{ route('admin.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.jobs*') ? 'bg-white/20 text-white' : '' }}">Jobs</a>
-                        <a href="{{ route('admin.documents.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.documents*') || request()->routeIs('admin.items*') ? 'bg-white/20 text-white' : '' }}">Documents</a>
-                        <div class="pl-6 flex flex-col">
-                            <a href="{{ route('admin.documents.index', ['type' => 'invoice']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Invoices</a>
-                            <a href="{{ route('admin.documents.index', ['type' => 'quote']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Quotes</a>
-                            <a href="{{ route('admin.documents.index', ['type' => 'receipt']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Receipts</a>
-                            <a href="{{ route('admin.items.index') }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Items</a>
-                        </div>
-                        <a href="{{ route('admin.users.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.users*') ? 'bg-white/20 text-white' : '' }}">Employees</a>
-                        <a href="{{ route('admin.financials') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.financials') ? 'bg-white/20 text-white' : '' }}">Financials</a>
-                        <a href="{{ route('admin.wordpress.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.wordpress*') ? 'bg-white/20 text-white' : '' }}">WordPress</a>
-                    @else
-                        <a href="{{ route('employee.dashboard') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.dashboard') ? 'bg-white/20 text-white' : '' }}">Dashboard</a>
-                        <a href="{{ route('employee.jobs.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs*') ? 'bg-white/20 text-white' : '' }}">My Jobs</a>
-                        <a href="{{ route('employee.jobs.create') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.create') ? 'bg-white/20 text-white' : '' }}">Log Job</a>
-                        <a href="{{ route('employee.jobs.history') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.jobs.history') ? 'bg-white/20 text-white' : '' }}">History</a>
-                        <a href="{{ route('employee.documents.index') }}" class="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('employee.documents*') || request()->routeIs('employee.items*') ? 'bg-white/20 text-white' : '' }}">Documents</a>
-                        <div class="pl-6 flex flex-col">
-                            <a href="{{ route('employee.documents.index', ['type' => 'invoice']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Invoices</a>
-                            <a href="{{ route('employee.documents.index', ['type' => 'quote']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Quotes</a>
-                            <a href="{{ route('employee.documents.index', ['type' => 'receipt']) }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Receipts</a>
-                            <a href="{{ route('employee.items.index') }}" class="text-gray-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium">Items</a>
-                        </div>
-                    @endif
-                    <button type="button" id="installPwaBtnMobile" class="flex items-center text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">
-                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-3-3m3 3l3-3"/></svg>
-                        Install App
-                    </button>
-                    <form method="POST" action="{{ route('logout') }}" class="pt-2 border-t border-white/10">
-                        @csrf
-                        <button type="submit" class="w-full text-left text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">Logout</button>
-                    </form>
+            @if(session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    {{ session('error') }}
                 </div>
-            </div>
-        </div>
-    </nav>
+            @endif
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @yield('content')
-    </main>
+            @yield('content')
+        </main>
+    </div>
 
     @yield('scripts')
 
     <script>
         (function () {
             var btn = document.getElementById('mobileMenuBtn');
-            var menu = document.getElementById('mobileMenu');
-            if (btn && menu) {
-                btn.addEventListener('click', function () {
-                    var hidden = menu.classList.toggle('hidden');
-                    var icon = document.getElementById('mobileMenuIcon');
-                    if (icon) {
-                        icon.innerHTML = hidden
-                            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>'
-                            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
-                    }
-                });
+            var closeBtn = document.getElementById('sidebarCloseBtn');
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            var icon = document.getElementById('mobileMenuIcon');
+
+            if (!btn || !sidebar) return;
+
+            function setOpen(open) {
+                sidebar.classList.toggle('-translate-x-full', !open);
+                if (overlay) overlay.classList.toggle('hidden', !open);
+                document.body.style.overflow = open ? 'hidden' : '';
+                if (icon) {
+                    icon.innerHTML = open
+                        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>'
+                        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+                }
             }
+
+            btn.addEventListener('click', function () {
+                setOpen(sidebar.classList.contains('-translate-x-full'));
+            });
+            if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); });
+            if (overlay) overlay.addEventListener('click', function () { setOpen(false); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') setOpen(false);
+            });
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 1024) setOpen(false);
+            });
         })();
 
         // ---------- PWA ----------
         (function () {
             var deferredPrompt = null;
             var installBtn = document.getElementById('installPwaBtn');
-            var installBtnMobile = document.getElementById('installPwaBtnMobile');
             var offlineBadge = document.getElementById('offlineBadge');
 
             function showInstallButtons() {
@@ -189,24 +192,21 @@
                 deferredPrompt.userChoice.then(function (choiceResult) {
                     if (choiceResult.outcome === 'accepted') {
                         if (installBtn) installBtn.classList.add('hidden');
-                        if (installBtnMobile) installBtnMobile.classList.add('hidden');
                     }
                     deferredPrompt = null;
                 });
             }
 
             if (installBtn) installBtn.addEventListener('click', doInstall);
-            if (installBtnMobile) installBtnMobile.addEventListener('click', doInstall);
 
             // Reflect app-installed state (hide install buttons once installed)
             window.addEventListener('appinstalled', function () {
                 if (installBtn) installBtn.classList.add('hidden');
-                if (installBtnMobile) installBtnMobile.classList.add('hidden');
             });
 
-            // Hide mobile install button if already running as an installed PWA
+            // Hide install button if already running as an installed PWA
             if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) {
-                if (installBtnMobile) installBtnMobile.classList.add('hidden');
+                if (installBtn) installBtn.classList.add('hidden');
             }
 
             // Online/offline indicator

@@ -50,11 +50,6 @@ Route::middleware(['auth.custom', 'admin'])->prefix('admin')->name('admin.')->gr
     Route::resource('documents', Documents\DocumentController::class)->except(['show']);
     Route::get('/documents/{document}/pdf', [Documents\DocumentController::class, 'downloadPdf'])->name('documents.pdf');
 
-    Route::get('/wordpress', [Admin\WordPressSetupController::class, 'index'])->name('wordpress.index');
-    Route::post('/wordpress', [Admin\WordPressSetupController::class, 'store'])->name('wordpress.store');
-    Route::get('/wordpress/{site}', [Admin\WordPressSetupController::class, 'show'])->name('wordpress.show');
-    Route::delete('/wordpress/{site}', [Admin\WordPressSetupController::class, 'destroy'])->name('wordpress.destroy');
-
     Route::get('/financials', [Admin\FinancialController::class, 'index'])->name('financials');
 
     Route::post('/fund-requests/{fundRequest}/approve', [Admin\FundRequestController::class, 'approve'])->name('fund-requests.approve');
