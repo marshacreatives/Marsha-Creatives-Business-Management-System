@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Documents;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Item;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -44,6 +45,8 @@ class ItemController extends Controller
             'subject_id' => $item->id,
             'subject_type' => Item::class,
         ]);
+
+        $this->notifyAdminsAboutItem($item);
 
         return redirect()->route($this->base().'.items.index')->with('success', 'Item created successfully.');
     }
@@ -92,5 +95,23 @@ class ItemController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
         ]);
+    }
+
+    /**
+     * Items are shared across the whole agency, so a new one added by an
+     * employee is worth surfacing to the admin.
+     */
+    private function notifyAdminsAboutItem(Item $item): void
+    {
+        if ($this->base() !== 'employee') {
+            return;
+        }
+
+        NotificationService::notifyAdmins(
+            'New item from '.auth()->user()->name,
+            "'{$item->title}' was added at KSh ".number_format((float) $item->price, 2).'.',
+            route('admin.items.index'),
+            'document',
+        );
     }
 }

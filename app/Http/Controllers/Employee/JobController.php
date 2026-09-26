@@ -8,6 +8,7 @@ use App\Models\Activity;
 use App\Models\CompanyBalance;
 use App\Models\FundRequest;
 use App\Models\ProjectJob;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -70,6 +71,13 @@ class JobController extends Controller
                 'description' => "{$user->name} requested KSh ".number_format($expense - $balance, 2)." additional funds for job '{$request->project_name}'",
             ]);
 
+            NotificationService::notifyAdmins(
+                'Fund request from '.$user->name,
+                'Requested KSh '.number_format($expense - $balance, 2)." to cover job '{$request->project_name}'.",
+                route('admin.dashboard'),
+                'fund',
+            );
+
             return redirect()->route('employee.jobs.create')
                 ->with('error', 'Insufficient funds! Your expense of KSh '.number_format($expense, 2).' exceeds the available balance of KSh '.number_format($balance, 2).'. A fund request has been sent to the admin.');
         }
@@ -93,6 +101,13 @@ class JobController extends Controller
             'subject_id' => $job->id,
             'subject_type' => ProjectJob::class,
         ]);
+
+        NotificationService::notifyAdmins(
+            'New job logged by '.$user->name,
+            "'{$job->project_name}' was logged at KSh ".number_format($expense, 2).' expense.',
+            route('admin.jobs.index'),
+            'job',
+        );
 
         return redirect()->route('employee.jobs.index')->with('success', 'Job logged successfully. KSh '.number_format($expense, 2).' deducted from company balance.');
     }
@@ -123,6 +138,13 @@ class JobController extends Controller
             'subject_id' => $job->id,
             'subject_type' => ProjectJob::class,
         ]);
+
+        NotificationService::notifyAdmins(
+            'Job status updated by '.$user->name,
+            "'{$job->project_name}' is now ".str_replace('_', ' ', $newStatus).'.',
+            route('admin.jobs.index'),
+            'job',
+        );
 
         return redirect()->route('employee.jobs.index', ['month' => request('month')])->with('success', 'Job status updated.');
     }

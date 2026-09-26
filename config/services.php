@@ -35,4 +35,22 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Web Push (VAPID)
+    |--------------------------------------------------------------------------
+    |
+    | Keys used to sign browser push requests. Generate a pair by running
+    | "php artisan push:vapid". The public key is handed to the browser and
+    | the private key must never leave the server. Push also requires the
+    | app to be served over HTTPS.
+    |
+    */
+
+    'vapid' => [
+        'public_key' => env('VAPID_PUBLIC_KEY'),
+        'private_key' => env('VAPID_PRIVATE_KEY'),
+        'subject' => env('VAPID_SUBJECT', 'mailto:admin@example.com'),
+    ],
+
 ];

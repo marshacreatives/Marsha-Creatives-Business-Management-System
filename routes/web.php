@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Documents;
 use App\Http\Controllers\Employee;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\Security;
 use Illuminate\Support\Facades\Route;
 
@@ -12,6 +14,23 @@ Route::get('/', fn () => redirect()->route('login'));
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+/*
+ * Notifications and push subscriptions are scoped per user rather than per
+ * role, so they sit outside the admin and employee groups and only require
+ * an authenticated session.
+ */
+Route::middleware('auth.custom')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/all', [NotificationController::class, 'page'])->name('notifications.page');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    Route::get('/push/key', [PushSubscriptionController::class, 'key'])->name('push.key');
+    Route::post('/push/subscribe', [PushSubscriptionController::class, 'store'])->name('push.subscribe');
+    Route::post('/push/unsubscribe', [PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
+});
 
 Route::middleware(['auth.custom', 'admin'])->prefix('security')->name('security.')->group(function () {
     Route::get('/', [Security\DashboardController::class, 'index'])->name('dashboard');

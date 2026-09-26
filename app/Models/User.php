@@ -5,11 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\HasDatabaseNotifications;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    /**
+     * HasDatabaseNotifications supplies databaseNotifications(), unreadNotifications
+     * and read(); Notifiable on its own only wires up the routing.
+     */
+    use HasDatabaseNotifications, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -44,6 +49,11 @@ class User extends Authenticatable
     public function activities(): HasMany
     {
         return $this->hasMany(Activity::class);
+    }
+
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
     }
 
     public function isAdmin(): bool

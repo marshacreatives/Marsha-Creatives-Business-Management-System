@@ -4,7 +4,8 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "test:sw": "node tests/js/service-worker.test.cjs"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

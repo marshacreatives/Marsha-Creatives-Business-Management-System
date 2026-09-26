@@ -7,6 +7,7 @@ use App\Models\Activity;
 use App\Models\CompanyBalance;
 use App\Models\ProjectJob;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -72,6 +73,14 @@ class JobController extends Controller
             'subject_type' => ProjectJob::class,
         ]);
 
+        NotificationService::notifyUser(
+            $assignee,
+            'New job assigned to you',
+            "'{$job->project_name}' was assigned to you by ".auth()->user()->name.'.',
+            route('employee.jobs.index'),
+            'job',
+        );
+
         return redirect()->route('admin.jobs.index')->with('success', 'Job created successfully.');
     }
 
@@ -97,6 +106,7 @@ class JobController extends Controller
         $oldExpense = (float) $job->expense;
         $newStatus = $request->status;
         $newExpense = (float) $request->expense;
+        $previousAssigneeId = (int) $job->assigned_to;
 
         $job->update([
             'project_name' => $request->project_name,
@@ -117,22 +127,69 @@ class JobController extends Controller
             'subject_type' => ProjectJob::class,
         ]);
 
+        $this->notifyAssigneeOfUpdate($job, $previousAssigneeId);
+
         return redirect()->route('admin.jobs.index')->with('success', 'Job updated successfully.');
+    }
+
+    /**
+     * Tell the employee about an edit to their job. When the job changed hands,
+     * both the new owner and the previous one are told.
+     */
+    private function notifyAssigneeOfUpdate(ProjectJob $job, int $previousAssigneeId): void
+    {
+        $newAssigneeId = (int) $job->assigned_to;
+
+        if ($newAssigneeId !== $previousAssigneeId) {
+            if ($previous = User::find($previousAssigneeId)) {
+                NotificationService::notifyUser(
+                    $previous,
+                    'Job reassigned',
+                    "'{$job->project_name}' is no longer assigned to you.",
+                    route('employee.jobs.index'),
+                    'job',
+                );
+            }
+        }
+
+        if (! $assignee = User::find($newAssigneeId)) {
+            return;
+        }
+
+        NotificationService::notifyUser(
+            $assignee,
+            $newAssigneeId === $previousAssigneeId ? 'Your job was updated' : 'Job assigned to you',
+            "'{$job->project_name}' is now ".str_replace('_', ' ', (string) $job->status).' (KSh '.number_format((float) $job->expense, 2).' expense).',
+            route('employee.jobs.index'),
+            'job',
+        );
     }
 
     public function destroy(ProjectJob $job)
     {
         $expense = (float) $job->expense;
+        $assignee = $job->assignee;
+        $projectName = $job->project_name;
 
         CompanyBalance::adjustBalance($expense);
 
         Activity::create([
             'user_id' => auth()->id(),
             'type' => 'job_deleted',
-            'description' => "Deleted job '{$job->project_name}'",
+            'description' => "Deleted job '{$projectName}'",
         ]);
 
         $job->delete();
+
+        if ($assignee) {
+            NotificationService::notifyUser(
+                $assignee,
+                'Job removed',
+                "'{$projectName}' was deleted from your jobs.",
+                route('employee.jobs.index'),
+                'job',
+            );
+        }
 
         return redirect()->route('admin.jobs.index')->with('success', 'Job deleted successfully.');
     }

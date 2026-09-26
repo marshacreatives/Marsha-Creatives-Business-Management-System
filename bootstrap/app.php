@@ -25,7 +25,22 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // The bell's poll and the push endpoints are only ever consumed by
+        // JavaScript, so a 404 or a validation failure has to come back as JSON
+        // instead of an HTML error page. Keyed by route name because the
+        // /notifications/all page shares the /notifications path prefix.
+        $jsonRoutes = [
+            'notifications.index',
+            'notifications.read',
+            'notifications.read-all',
+            'notifications.destroy',
+            'push.key',
+            'push.subscribe',
+            'push.unsubscribe',
+        ];
+
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*'),
+            fn (Request $request) => $request->is('api/*')
+                || in_array($request->route()?->getName(), $jsonRoutes, true),
         );
     })->create();

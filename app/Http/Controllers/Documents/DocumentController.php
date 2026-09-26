@@ -7,6 +7,7 @@ use App\Models\Activity;
 use App\Models\Document;
 use App\Models\DocumentItem;
 use App\Models\Item;
+use App\Services\NotificationService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -79,6 +80,15 @@ class DocumentController extends Controller
             'subject_id' => $document->id,
             'subject_type' => Document::class,
         ]);
+
+        if ($this->base() === 'employee') {
+            NotificationService::notifyAdmins(
+                'New '.$document->type_label.' from '.auth()->user()->name,
+                "{$document->number} was issued to {$document->client_name}.",
+                route('admin.documents.index', ['type' => $document->type]),
+                'document',
+            );
+        }
 
         return redirect()->route($this->base().'.documents.index', ['type' => $document->type])
             ->with('success', "{$document->type_label} {$document->number} created successfully.");
@@ -174,6 +184,15 @@ class DocumentController extends Controller
             'subject_id' => $item->id,
             'subject_type' => Item::class,
         ]);
+
+        if ($this->base() === 'employee') {
+            NotificationService::notifyAdmins(
+                'New item from '.auth()->user()->name,
+                "'{$item->title}' was added at KSh ".number_format((float) $item->price, 2).'.',
+                route('admin.items.index'),
+                'document',
+            );
+        }
 
         return response()->json([
             'id' => $item->id,
