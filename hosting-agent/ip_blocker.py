@@ -125,11 +125,13 @@ class IPBlocker:
         """Check if an IP is currently blocked by the firewall."""
         try:
             if self.block_method == 'csf':
+                # csf -g exits 0 when the IP is found in the deny/allow/deny
+                # lists, 1 when not found (grep semantics).
                 result = subprocess.run(
                     ['/usr/sbin/csf', '-g', ip],
                     capture_output=True, text=True, timeout=10
                 )
-                return result.returncode == 1 and 'DENY' in result.stdout
+                return result.returncode == 0 and 'DENY' in result.stdout
             elif self.block_method == 'firewalld':
                 result = subprocess.run(
                     ['firewall-cmd', '--list-rich-rules'],

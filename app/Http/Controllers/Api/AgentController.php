@@ -8,16 +8,11 @@ use App\Models\AgentLog;
 use App\Models\BlockedIP;
 use App\Models\SecurityAlert;
 use App\Models\ServerStatus;
-use App\Services\TelegramService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AgentController extends Controller
 {
-    public function __construct(
-        protected TelegramService $telegram,
-    ) {}
-
     /**
      * Receive a security alert from the agent.
      */
@@ -142,7 +137,9 @@ class AgentController extends Controller
             $blocked->is_active = true;
             $blocked->save();
 
-            $this->telegram->sendBlocked($validated['ip'], $validated['reason']);
+            // NOTE: like storeAlert, Telegram notifications are handled by
+            // the agent itself (hosting-agent/reporter.py report_block).
+            // Sending again here would duplicate every block notification.
 
             return response()->json(['success' => true, 'block_id' => $blocked->id]);
         } catch (\Exception $e) {
@@ -167,7 +164,7 @@ class AgentController extends Controller
 
             if ($blocked) {
                 $blocked->unblock();
-                $this->telegram->sendUnblocked($validated['ip']);
+                // Telegram unblock notice is sent by the agent itself.
             }
 
             return response()->json(['success' => true]);

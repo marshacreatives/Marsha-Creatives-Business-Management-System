@@ -12,6 +12,7 @@ longer interval (default 1 hour) and uses several heuristics:
 """
 
 import configparser
+import json
 import os
 import re
 import time
@@ -45,6 +46,17 @@ class FileIntegrity:
         self._scan_interval = 3600  # 1 hour
         self._last_scan = 0
 
+        # Alert dedupe: (filepath -> (mtime, size)) of files already reported.
+        # Without this, the hourly scan re-alerts the same unchanged file every
+        # hour — in production this produced ~80k false-positive "webshell"
+        # alerts/day from legitimate WordPress plugin code. An entry is
+        # dropped (so the file can re-alert) only once the file changes.
+        self._alerted_state_file = self.config.get(
+            'file_integrity', 'alerted_state_file',
+            fallback='/var/lib/hosting-agent/file_integrity_alerted.json',
+        )
+        self._alerted = self._load_alerted_state()
+
         # Regex for dangerous function call
         fn_pattern = '|'.join(re.escape(f) for f in self.dangerous_functions)
         self._dangerous_fn_re = re.compile(rf'\b({fn_pattern})\s*\(')
@@ -77,6 +89,50 @@ class FileIntegrity:
             r'\.(php\d?|phtml|pht|phar)\.?$|\.(jpg|jpeg|png|gif|ico|svg)\.php\d?$',
             re.IGNORECASE,
         )
+
+    def _load_alerted_state(self) -> dict:
+        try:
+            with open(self._alerted_state_file, 'r') as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                return data
+        except (OSError, ValueError):
+            pass
+        return {}
+
+    def _save_alerted_state(self):
+        try:
+            os.makedirs(os.path.dirname(self._alerted_state_file), exist_ok=True)
+            tmp = self._alerted_state_file + '.tmp'
+            with open(tmp, 'w') as f:
+                json.dump(self._alerted, f)
+            os.replace(tmp, self._alerted_state_file)
+        except OSError as e:
+            self.logger.error(f"Could not save file_integrity state: {e}")
+
+    def _already_alerted(self, filepath: str) -> bool:
+        """True if this exact file version was already reported.
+
+        Keys on (mtime, size) so a modified file re-alerts, while an
+        unchanged file stays silent until it is actually touched.
+        """
+        try:
+            st = os.stat(filepath)
+        except OSError:
+            return False
+        key = filepath
+        sig = [st.st_mtime, st.st_size]
+        prev = self._alerted.get(key)
+        if prev and list(prev) == sig:
+            return True
+        return False
+
+    def _mark_alerted(self, filepath: str):
+        try:
+            st = os.stat(filepath)
+            self._alerted[filepath] = [st.st_mtime, st.st_size]
+        except OSError:
+            pass
 
     def check(self):
         """Scan for webshells and file integrity issues.
@@ -117,6 +173,8 @@ class FileIntegrity:
 
             # Check for injected .htaccess files
             self._scan_htaccess(user_home, account_dir, findings)
+
+        self._save_alerted_state()
 
         return findings
 
@@ -182,6 +240,9 @@ class FileIntegrity:
 
                 rel = os.path.relpath(filepath, os.path.join(self.home_base, account))
 
+                if self._already_alerted(filepath):
+                    continue
+
                 # A bare .php in uploads is almost certainly a webshell.
                 if lower.endswith(('.php', '.php5', '.php7', '.php8', '.phtml', '.pht', '.phar', '.shtml', '.cgi')):
                     findings.append({
@@ -195,6 +256,7 @@ class FileIntegrity:
                                    "Uploads directories must not contain executable scripts.",
                         'action_taken': 'Remove file and quarantine account immediately',
                     })
+                    self._mark_alerted(filepath)
                     self.reporter.report_action(
                         action='quarantine_file',
                         resource=filepath,
@@ -223,6 +285,7 @@ class FileIntegrity:
                         'raw_log': f"File: {filepath}\nSnippet:\n{self._snippet(content)}",
                         'action_taken': 'Remove file and quarantine account immediately',
                     })
+                    self._mark_alerted(filepath)
                     self.reporter.report_action(
                         action='quarantine_file',
                         resource=filepath,
@@ -239,6 +302,7 @@ class FileIntegrity:
                         'raw_log': f"File: {filepath}",
                         'action_taken': 'Review and remove if not legitimate',
                     })
+                    self._mark_alerted(filepath)
 
     def _inspect_php_file(self, filepath: str, account: str, findings: list):
         """Check a single PHP file for webshell signatures."""
@@ -254,6 +318,11 @@ class FileIntegrity:
 
         rel_path = os.path.relpath(filepath, os.path.join(self.home_base, account))
 
+        # Alert at most once per unchanged file version. The hourly scan
+        # would otherwise re-report the same (static) file forever.
+        if self._already_alerted(filepath):
+            return
+
         # 1. Dangerous function calls
         if self._dangerous_fn_re.search(content):
             # Check if it looks truly malicious (encoded payload + dangerous fn)
@@ -265,6 +334,7 @@ class FileIntegrity:
                     'raw_log': f"File: {filepath}\nSnippet:\n{self._snippet(content)}",
                     'action_taken': 'Quarantine account and scan thoroughly',
                 })
+                self._mark_alerted(filepath)
             else:
                 # Flag only when a dangerous function is paired with an actual
                 # execution signal (a payload variable or base64 in its arg),
@@ -279,6 +349,7 @@ class FileIntegrity:
                         'raw_log': f"File: {filepath}\nSnippet:\n{self._snippet(content)}",
                         'action_taken': 'Review file for legitimacy',
                     })
+                    self._mark_alerted(filepath)
 
         # 2. Forged PHP with .htaccess combo already covered separately
 
@@ -300,13 +371,15 @@ class FileIntegrity:
                 except Exception:
                     continue
                 if self._global_htaccess_re.search(content):
-                    findings.append({
-                        'type': 'htaccess_injection',
-                        'severity': 'high',
-                        'description': f"Suspicious .htaccess in {account}: {dirpath}",
-                        'raw_log': content[:1000],
-                        'action_taken': 'Review .htaccess for malicious directives',
-                    })
+                    if not self._already_alerted(ht_path):
+                        findings.append({
+                            'type': 'htaccess_injection',
+                            'severity': 'high',
+                            'description': f"Suspicious .htaccess in {account}: {dirpath}",
+                            'raw_log': content[:1000],
+                            'action_taken': 'Review .htaccess for malicious directives',
+                        })
+                        self._mark_alerted(ht_path)
 
     def _snippet(self, content: str, length: int = 500) -> str:
         """Extract a short readable snippet around the first suspicious token."""

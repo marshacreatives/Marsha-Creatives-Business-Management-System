@@ -118,14 +118,11 @@ class HostingAgent:
                 self.logger.info(f"{module_name} complete: {len(findings)} alerts, {elapsed:.0f}ms")
 
                 for finding in findings:
-                    self.logger.warning(f"{module_name} alert: {finding.get('description')} src={finding.get('source_ip')}")
+                    source_ip = finding.get('source_ip')
+                    self.logger.warning(f"{module_name} alert: {finding.get('description')} src={source_ip}")
 
                     # Record the alert via reporter
                     self.reporter.report_alert(finding)
-
-                    # Block if a source IP is flagged and blocking is enabled
-                    source_ip = finding.get('source_ip')
-                    self.logger.warning(f"{module_name} alert: {finding.get('description')} src={source_ip}")
 
             except Exception as e:
                 self.logger.error(f"Error running {module_name}: {e}", exc_info=self.foreground)

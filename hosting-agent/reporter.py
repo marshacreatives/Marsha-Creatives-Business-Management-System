@@ -43,23 +43,30 @@ class Reporter:
     # ------------------------------------------------------------------
     # HTTP Helper
     # ------------------------------------------------------------------
-    def _http_post(self, url: str, data: dict):
-        """POST JSON to URL with API key header."""
+    def _http_post(self, url: str, data: dict, timeout: int = 15):
+        """POST JSON to URL with API key header.
+
+        Returns (status_code, body_dict) on success or (status_code_or_None,
+        None) on failure. Callers that need to distinguish an HTTP error from
+        a network failure (e.g. Telegram parse-mode retry) should check the
+        status code: None means the request never got an HTTP response.
+        """
         if not url:
-            return None
+            return None, None
         payload = json.dumps(data).encode('utf-8')
         req = urllib.request.Request(url, data=payload, method='POST')
         req.add_header('Content-Type', 'application/json')
         if self.api_key:
             req.add_header('X-Agent-Key', self.api_key)
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                return json.loads(resp.read().decode('utf-8'))
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return resp.status, json.loads(resp.read().decode('utf-8'))
         except urllib.error.HTTPError as e:
             self.logger.error(f"HTTP {e.code} posting to {url}: {e.read().decode()}")
+            return e.code, None
         except Exception as e:
             self.logger.error(f"Error posting to {url}: {e}")
-        return None
+            return None, None
 
     # ------------------------------------------------------------------
     # Dashboard reporting
@@ -197,12 +204,15 @@ class Reporter:
             'parse_mode': parse_mode,
             'disable_web_page_preview': True,
         }
-        result = self._http_post(url, payload)
+        status, _ = self._http_post(url, payload)
 
-        # If parse failed (HTTP 400), retry as plain text so alerts always deliver
-        if result is None:
-            payload['parse_mode'] = ''
-            self._http_post(url, {k: v for k, v in payload.items() if v != ''})
+        # Retry as plain text ONLY on HTTP 400 (Telegram rejected the parse
+        # mode / entities). Retrying on timeouts or other failures would
+        # duplicate the message whenever Telegram actually received the
+        # first send but the response was lost.
+        if status == 400:
+            payload.pop('parse_mode', None)
+            self._http_post(url, payload)
 
     def send_daily_summary(self):
         """Send a daily summary of security events to Telegram."""

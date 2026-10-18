@@ -11,6 +11,8 @@ class SecurityAgentApiTest extends TestCase
 
     public function test_ping_requires_valid_api_key(): void
     {
+        config(['security.agent_api_key' => 'test-secret']);
+
         $response = $this->getJson('/api/agent/ping');
         $response->assertStatus(401);
     }

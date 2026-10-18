@@ -15,6 +15,7 @@ Automatically blocks offending IPs after a threshold is hit.
 """
 
 import configparser
+import json
 import os
 import re
 import time
@@ -39,6 +40,17 @@ class ApacheGuard:
         self._last_access_pos = 0
         self._last_error_pos = 0
         self._suspicious = defaultdict(list)
+        self._last_error_alert = 0.0
+
+        # Persist log read positions across restarts. Without this, every
+        # agent/OS restart re-reads the entire Apache log from byte 0 and
+        # re-blocks/re-notifies every historical attack (seen in production
+        # as a flood of duplicate "IP BLOCKED" messages after each reboot).
+        self._state_file = self.config.get(
+            'apache_guard', 'state_file',
+            fallback='/var/lib/hosting-agent/apache_guard_state.json',
+        )
+        self._load_state()
 
         self._sql_injection_re = re.compile(
             r"(union\s+select|select\s+.*\s+from|insert\s+into|\bupdate\b.*\bset\b|"
@@ -67,6 +79,73 @@ class ApacheGuard:
             r"metasploit|fuzz|scan|vuln|exploit|probing|nikto)",
             re.IGNORECASE,
         )
+
+    def _load_state(self):
+        """Load persisted log positions; start at EOF on first run.
+
+        Starting at EOF (instead of 0) when no state exists means a fresh
+        install or a restart without state never replays historical log
+        content — which would otherwise re-trigger blocks and Telegram
+        notifications for attacks that were already handled.
+        """
+        saved = {}
+        try:
+            with open(self._state_file, 'r') as f:
+                saved = json.load(f)
+        except (OSError, ValueError):
+            saved = {}
+
+        self._last_access_pos = self._init_log_pos(
+            self.access_log, saved.get('access_pos'), saved.get('access_ino'))
+        self._last_error_pos = self._init_log_pos(
+            self.error_log, saved.get('error_pos'), saved.get('error_ino'))
+        self._save_state()
+
+    def _init_log_pos(self, log_path: str, saved_pos, saved_ino) -> int:
+        """Resolve where to start reading a log file.
+
+        - No saved position: start at EOF (skip history).
+        - Saved position but file was rotated/replaced (inode changed) or
+          truncated (size < saved pos): start at 0 (new file, read it all).
+        - Otherwise: resume from the saved position.
+        """
+        try:
+            st = os.stat(log_path)
+        except OSError:
+            return 0
+
+        if saved_pos is None:
+            return st.st_size
+
+        if saved_ino is not None and st.st_ino != saved_ino:
+            return 0
+
+        if st.st_size < saved_pos:
+            return 0
+
+        return saved_pos
+
+    def _save_state(self):
+        """Persist current log positions (and inodes) to the state file."""
+        state = {}
+        for key, path, pos in (
+            ('access', self.access_log, self._last_access_pos),
+            ('error', self.error_log, self._last_error_pos),
+        ):
+            state[f'{key}_pos'] = pos
+            try:
+                state[f'{key}_ino'] = os.stat(path).st_ino
+            except OSError:
+                state[f'{key}_ino'] = None
+
+        try:
+            os.makedirs(os.path.dirname(self._state_file), exist_ok=True)
+            tmp = self._state_file + '.tmp'
+            with open(tmp, 'w') as f:
+                json.dump(state, f)
+            os.replace(tmp, self._state_file)
+        except OSError as e:
+            self.logger.error(f"Could not save apache_guard state: {e}")
 
     def check(self):
         """Scan Apache logs for attacks.
@@ -124,6 +203,7 @@ class ApacheGuard:
                 f.seek(self._last_access_pos)
                 new_lines = f.readlines()
                 self._last_access_pos = f.tell()
+            self._save_state()
 
             attacks_per_ip = defaultdict(list)
 
@@ -204,14 +284,28 @@ class ApacheGuard:
                 f.seek(self._last_error_pos)
                 new_lines = f.readlines()
                 self._last_error_pos = f.tell()
+            self._save_state()
 
             cgi_errors = 0
             for line in new_lines:
-                # Detect suspicious CGI/execution errors
-                if re.search(r'(cgi|\.cmd|\.exe|/bin/|perl|sh -c)', line, re.IGNORECASE):
+                # Detect suspicious CGI/execution errors — require an actual
+                # execution-failure signature, not just any mention of /bin/ or
+                # cgi (which appears constantly in normal cPanel/LFD/PHP traffic
+                # and used to fire this alert every single check cycle).
+                if re.search(
+                    r'(exec format error|permission denied.*/cgi-?bin|'
+                    r'script not found or unable to stat|'
+                    r'(?:/bin/(?:sh|bash|perl|python))\s*:?\s*(?:not found|no such file)|'
+                    r'end of script output before headers)',
+                    line, re.IGNORECASE,
+                ):
                     cgi_errors += 1
 
-            if cgi_errors > 3:
+            # Rate-limit: at most one error-log alert per hour. This check
+            # runs every cycle and the log keeps growing; without a cooldown
+            # the same historical errors would re-alert forever.
+            if cgi_errors > 3 and (now - self._last_error_alert >= 3600):
+                self._last_error_alert = now
                 findings.append({
                     'type': 'web_attack',
                     'severity': 'medium',
