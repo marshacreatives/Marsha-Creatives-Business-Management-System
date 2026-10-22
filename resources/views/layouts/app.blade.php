@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Marsha BMS">
     <link rel="apple-touch-icon" href="{{ asset('images/icons/icon-180.png') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('css/tailwind.css') }}">
     <style>
         .gradient-bg { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); }
         .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
